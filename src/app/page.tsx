@@ -41,6 +41,7 @@ export default function Home() {
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [lastWin, setLastWin] = useState<WinningResult | null>(null);
+  const [isLoadingWin, setIsLoadingWin] = useState(true);
 
   // 설정값
   const [count, setCount] = useState(6);
@@ -52,21 +53,20 @@ export default function Home() {
     fetchLastWinningNumbers();
   }, []);
 
-  // 실제 로또 당첨 번호 가져오기 (임시 샘플 데이터, 향후 API 연동)
-  const fetchLastWinningNumbers = () => {
-    // 실제 운영 시에는 프록시 서버나 API를 통해 가져옵니다.
-    // 여기서는 최신 회차(예: 1200회)의 샘플 데이터를 세팅합니다.
-    setLastWin({
-      drwNo: 1210,
-      drwtNo1: 3,
-      drwtNo2: 7,
-      drwtNo3: 14,
-      drwtNo4: 25,
-      drwtNo5: 31,
-      drwtNo6: 42,
-      bnusNo: 8,
-      drwNoDate: "2026-02-28"
-    });
+  // [진짜 실시간 데이터 도전!] 서버 API를 호출하여 당첨 번호 가져오기
+  const fetchLastWinningNumbers = async () => {
+    setIsLoadingWin(true);
+    try {
+      const response = await fetch("/api/lotto");
+      const data = await response.json();
+      if (data.drwNo) {
+        setLastWin(data);
+      }
+    } catch (error) {
+      console.error("실시간 데이터 가져오기 실패:", error);
+    } finally {
+      setIsLoadingWin(false);
+    }
   };
 
   const fetchHistory = async () => {
@@ -94,9 +94,8 @@ export default function Home() {
       const min = 1;
       const generatedSet = new Set<number>();
 
-      // Smart 모드일 때 가중치 로직 (예시: 이전 당첨 번호 중 하나를 포함할 확률 부여 등)
+      // Smart 모드일 때 가중치 로직
       if (genMode === "Smart" && lastWin) {
-        // 스마트 모드 맛보기: 이전 회차 당첨 번호 중 1개를 30% 확률로 포함
         if (Math.random() < 0.3) {
           const winNums = [lastWin.drwtNo1, lastWin.drwtNo2, lastWin.drwtNo3, lastWin.drwtNo4, lastWin.drwtNo5, lastWin.drwtNo6];
           generatedSet.add(winNums[Math.floor(Math.random() * 6)]);
@@ -153,33 +152,45 @@ export default function Home() {
         {activeTab === "generate" && (
           <div className="flex flex-col gap-6 animate-in fade-in duration-300">
             
-            {/* 최신 당첨 번호 배너 */}
-            {lastWin && (
-              <section className="bg-neutral-900 text-white p-5 rounded-[2rem] shadow-xl overflow-hidden relative group">
-                <div className="flex justify-between items-start mb-3">
-                  <div>
-                    <span className="text-[10px] font-bold bg-blue-600 px-2 py-0.5 rounded-full uppercase tracking-wider">Latest Win</span>
-                    <h3 className="text-lg font-bold mt-1">{lastWin.drwNo}회 당첨 번호</h3>
+            {/* 최신 당첨 번호 배너 (실시간) */}
+            <section className="bg-neutral-900 text-white p-5 rounded-[2rem] shadow-xl overflow-hidden relative min-h-[110px] flex flex-col justify-center">
+              {isLoadingWin ? (
+                <div className="flex items-center gap-3 animate-pulse">
+                  <div className="w-10 h-10 bg-gray-700 rounded-full"></div>
+                  <div className="flex-1 space-y-2">
+                    <div className="h-4 bg-gray-700 rounded w-1/2"></div>
+                    <div className="h-3 bg-gray-700 rounded w-3/4"></div>
                   </div>
-                  <span className="text-[10px] text-gray-400">{lastWin.drwNoDate}</span>
                 </div>
-                <div className="flex gap-2 justify-between items-center">
-                  <div className="flex gap-1.5">
-                    {[lastWin.drwtNo1, lastWin.drwtNo2, lastWin.drwtNo3, lastWin.drwtNo4, lastWin.drwtNo5, lastWin.drwtNo6].map((num, i) => (
-                      <div key={i} className={`w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold ${getBallColor(num)}`}>
-                        {num}
-                      </div>
-                    ))}
+              ) : lastWin ? (
+                <>
+                  <div className="flex justify-between items-start mb-3">
+                    <div>
+                      <span className="text-[10px] font-bold bg-green-500 px-2 py-0.5 rounded-full uppercase tracking-wider">LIVE DATA</span>
+                      <h3 className="text-lg font-bold mt-1">{lastWin.drwNo}회 당첨 결과</h3>
+                    </div>
+                    <span className="text-[10px] text-gray-400">{lastWin.drwNoDate}</span>
                   </div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-gray-500 text-xs">+</span>
-                    <div className={`w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold ${getBallColor(lastWin.bnusNo)}`}>
-                      {lastWin.bnusNo}
+                  <div className="flex gap-2 justify-between items-center">
+                    <div className="flex gap-1.5">
+                      {[lastWin.drwtNo1, lastWin.drwtNo2, lastWin.drwtNo3, lastWin.drwtNo4, lastWin.drwtNo5, lastWin.drwtNo6].map((num, i) => (
+                        <div key={i} className={`w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold ${getBallColor(num)}`}>
+                          {num}
+                        </div>
+                      ))}
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-gray-500 text-xs">+</span>
+                      <div className={`w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold ${getBallColor(lastWin.bnusNo)}`}>
+                        {lastWin.bnusNo}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </section>
-            )}
+                </>
+              ) : (
+                <div className="text-sm text-gray-500">당첨 번호를 가져오지 못했습니다.</div>
+              )}
+            </section>
 
             {/* 설정 섹션 */}
             <section className="grid grid-cols-1 gap-3">
