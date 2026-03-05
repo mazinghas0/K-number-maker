@@ -1,13 +1,15 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase";
 
 // 데이터 타입 정의
 interface HistoryItem {
   id: string;
   numbers: number[];
-  timestamp: string;
   mode: string;
+  created_at?: string; // Supabase에서 오는 시간
+  timestamp?: string;  // 화면 표시용
 }
 
 type AppMode = "Quick" | "Smart" | "Rules";
@@ -22,33 +24,47 @@ const getBallColor = (num: number) => {
 };
 
 export default function Home() {
-  // 상태 관리
   const [activeTab, setActiveTab] = useState<TabType>("generate");
   const [numbers, setNumbers] = useState<number[]>([]);
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
 
-  // 설정값 상태
+  // 설정값
   const [count, setCount] = useState(6);
   const [maxNum, setMaxNum] = useState(45);
   const [genMode, setGenMode] = useState<AppMode>("Quick");
 
-  // 앱 시작 시 로컬 스토리지에서 기록 불러오기
+  // 앱 시작 시 Supabase에서 기록 불러오기
   useEffect(() => {
-    const savedHistory = localStorage.getItem("k-number-history");
-    if (savedHistory) setHistory(JSON.parse(savedHistory));
+    fetchHistory();
   }, []);
 
-  const saveToLocalStorage = (newHistory: HistoryItem[]) => {
-    localStorage.setItem("k-number-history", JSON.stringify(newHistory));
-    setHistory(newHistory);
+  const fetchHistory = async () => {
+    const { data, error } = await supabase
+      .from("lotto_history")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(50);
+
+    if (error) {
+      console.error("기록을 불러오는데 실패했습니다:", error);
+      // 실패 시 로컬 스토리지 백업 시도 가능
+    } else {
+      // 시간 형식 변환
+      const formattedData = data.map(item => ({
+        ...item,
+        timestamp: new Date(item.created_at).toLocaleString("ko-KR", { 
+          month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" 
+        })
+      }));
+      setHistory(formattedData);
+    }
   };
 
-  // 번호 생성 로직
-  const generateNumbers = () => {
+  const generateNumbers = async () => {
     setIsGenerating(true);
     
-    setTimeout(() => {
+    setTimeout(async () => {
       const min = 1;
       const generatedSet = new Set<number>();
 
@@ -62,23 +78,40 @@ export default function Home() {
       const sortedNumbers = Array.from(generatedSet).sort((a, b) => a - b);
       setNumbers(sortedNumbers);
 
-      const newItem: HistoryItem = {
-        id: crypto.randomUUID(),
-        numbers: sortedNumbers,
-        timestamp: new Date().toLocaleString("ko-KR", { 
-          month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" 
-        }),
-        mode: genMode
-      };
+      // Supabase에 저장
+      const { data, error } = await supabase
+        .from("lotto_history")
+        .insert([{ numbers: sortedNumbers, mode: genMode }])
+        .select();
 
-      const updatedHistory = [newItem, ...history].slice(0, 50);
-      saveToLocalStorage(updatedHistory);
+      if (error) {
+        console.error("클라우드 저장 실패:", error);
+      } else if (data) {
+        // 성공 시 로컬 상태 업데이트
+        const newItem: HistoryItem = {
+          ...data[0],
+          timestamp: new Date(data[0].created_at).toLocaleString("ko-KR", { 
+            month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" 
+          })
+        };
+        setHistory([newItem, ...history].slice(0, 50));
+      }
+      
       setIsGenerating(false);
     }, 500);
   };
 
-  const deleteHistoryItem = (id: string) => {
-    saveToLocalStorage(history.filter(item => item.id !== id));
+  const deleteHistoryItem = async (id: string) => {
+    const { error } = await supabase
+      .from("lotto_history")
+      .delete()
+      .match({ id });
+
+    if (error) {
+      console.error("삭제 실패:", error);
+    } else {
+      setHistory(history.filter(item => item.id !== id));
+    }
   };
 
   return (
@@ -95,10 +128,8 @@ export default function Home() {
 
       <main className="flex-1 overflow-y-auto px-6 py-6 pb-28">
         
-        {/* [1] 번호 생성 탭 */}
         {activeTab === "generate" && (
           <div className="flex flex-col gap-8 animate-in fade-in duration-300">
-            {/* 설정 섹션 */}
             <section className="grid grid-cols-1 gap-3">
               <div className="flex flex-col gap-2 p-4 bg-gray-50 dark:bg-neutral-800 rounded-2xl">
                 <div className="flex justify-between items-center">
@@ -113,25 +144,17 @@ export default function Home() {
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                <button 
-                  onClick={() => setMaxNum(maxNum === 45 ? 50 : 45)}
-                  className="flex flex-col gap-1 p-4 bg-gray-50 dark:bg-neutral-800 rounded-2xl text-left border-2 border-transparent active:border-blue-500 transition-all"
-                >
+                <button onClick={() => setMaxNum(maxNum === 45 ? 50 : 45)} className="flex flex-col gap-1 p-4 bg-gray-50 dark:bg-neutral-800 rounded-2xl text-left border-2 border-transparent active:border-blue-500 transition-all">
                   <span className="text-xs font-medium text-gray-500 uppercase">범위</span>
                   <span className="text-lg font-bold">1 ~ {maxNum}</span>
                 </button>
-                
-                <button 
-                  onClick={() => setGenMode(genMode === "Quick" ? "Smart" : genMode === "Smart" ? "Rules" : "Quick")}
-                  className="flex flex-col gap-1 p-4 bg-gray-50 dark:bg-neutral-800 rounded-2xl text-left border-2 border-transparent active:border-blue-500 transition-all"
-                >
+                <button onClick={() => setGenMode(genMode === "Quick" ? "Smart" : genMode === "Smart" ? "Rules" : "Quick")} className="flex flex-col gap-1 p-4 bg-gray-50 dark:bg-neutral-800 rounded-2xl text-left border-2 border-transparent active:border-blue-500 transition-all">
                   <span className="text-xs font-medium text-gray-500 uppercase">모드</span>
                   <span className="text-lg font-bold text-blue-500">{genMode}</span>
                 </button>
               </div>
             </section>
 
-            {/* 결과 표시 */}
             <section className="flex flex-col items-center justify-center min-h-[220px] bg-blue-50/30 dark:bg-blue-900/10 rounded-3xl p-6 border-2 border-blue-100 dark:border-blue-900/30">
               {numbers.length === 0 ? (
                 <div className="text-center text-gray-400">
@@ -154,7 +177,6 @@ export default function Home() {
               )}
             </section>
 
-            {/* 생성 버튼 */}
             <button
               onClick={generateNumbers}
               disabled={isGenerating}
@@ -162,17 +184,16 @@ export default function Home() {
                 isGenerating ? "bg-blue-400" : "bg-blue-600 hover:bg-blue-700"
               }`}
             >
-              {isGenerating ? "추첨 중..." : "번호 생성하기"}
+              {isGenerating ? "클라우드 저장 중..." : "번호 생성하기"}
             </button>
           </div>
         )}
 
-        {/* [2] 히스토리 탭 */}
         {activeTab === "history" && (
           <div className="flex flex-col gap-4 animate-in slide-in-from-right-4 duration-300">
-            <h2 className="text-lg font-bold px-2">나의 행운 기록</h2>
+            <h2 className="text-lg font-bold px-2">나의 행운 기록 (클라우드)</h2>
             {history.length === 0 ? (
-              <div className="text-center py-20 text-gray-400">아직 저장된 기록이 없습니다.</div>
+              <div className="text-center py-20 text-gray-400">저장된 기록이 없습니다.</div>
             ) : (
               <div className="space-y-3">
                 {history.map((item) => (
@@ -198,7 +219,6 @@ export default function Home() {
           </div>
         )}
 
-        {/* [3] AI 에이전트 탭 */}
         {activeTab === "agent" && (
           <div className="flex flex-col items-center justify-center py-20 animate-in slide-in-from-right-4 duration-300 text-center gap-4">
             <div className="w-20 h-20 bg-blue-600 rounded-3xl flex items-center justify-center text-4xl shadow-2xl shadow-blue-500/50">🤖</div>
@@ -209,7 +229,6 @@ export default function Home() {
         )}
       </main>
 
-      {/* 하단 탭 바 */}
       <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] bg-white/90 dark:bg-black/90 backdrop-blur-xl border-t border-gray-100 dark:border-gray-800 flex justify-around items-center py-3 z-20">
         <button onClick={() => setActiveTab("generate")} className={`flex flex-col items-center gap-1 transition-all ${activeTab === "generate" ? "text-blue-600 scale-110" : "text-gray-400"}`}>
           <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20m10-10H2"/></svg>
