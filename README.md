@@ -1,36 +1,33 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# K-number maker 🍀
 
-## Getting Started
+"나만의 맞춤 번호 생성기 + 루틴 관리 AI 도구"
 
-First, run the development server:
+K-number maker는 사용자가 원하는 규칙과 통계, 또는 완전 무작위(Quick Random) 방식을 통해 번호를 추첨할 수 있게 도와주는 모바일 퍼스트 웹앱(PWA 지향)입니다.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🚀 프로젝트 목표 (MVP v1.0)
+*   사용자 맞춤형 번호 생성 기능 (기본 6/45 방식 지원)
+*   모바일 환경에 최적화된 매끄러운 UI/UX
+*   생성된 번호 기록(History)을 브라우저 로컬 스토리지에 저장
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🛠 기술 스택
+*   **프론트엔드**: Next.js 15 (App Router), React 19
+*   **스타일링**: Tailwind CSS v4
+*   **언어**: TypeScript
+*   **핵심 로직**: Web Crypto API (난수 생성 알고리즘)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 📦 설치 및 실행 방법
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1.  의존성 설치
+    ```bash
+    npm install
+    ```
+2.  개발 서버 실행
+    ```bash
+    npm run dev
+    ```
+3.  브라우저에서 `http://localhost:3000` 접속
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 📑 주요 지침 (AI_INSTRUCTIONS.md 기반)
+*   **한국어 소통**: 모든 문서 및 주석은 한국어로 작성됩니다.
+*   **클린 코드**: 유지보수성과 가독성을 최우선으로 합니다.
+*   **성능 최적화**: 모바일 기기에서도 빠르게 구동되도록 가볍고 빠른 동작을 지향합니다.
