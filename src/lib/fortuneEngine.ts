@@ -43,13 +43,12 @@ export function analyzeDestiny(birthDate: string): ElementInfo {
 }
 
 /**
- * 번호 대역별 공 색상 유틸리티
+ * 번호 대역별 공 색상 유틸리티 (명확한 5색 구분)
  */
-export function getBallColor(num: number, max: number = 45): string {
-  const percent = (num / max) * 100;
-  if (percent <= 20) return "bg-gradient-to-br from-yellow-300 to-yellow-500 text-yellow-950";
-  if (percent <= 40) return "bg-gradient-to-br from-blue-300 to-blue-500 text-blue-950";
-  if (percent <= 60) return "bg-gradient-to-br from-red-300 to-red-500 text-red-950";
-  if (percent <= 80) return "bg-gradient-to-br from-gray-300 to-gray-500 text-gray-950";
-  return "bg-gradient-to-br from-green-300 to-green-500 text-green-950";
+export function getBallColor(num: number): string {
+  if (num >= 1 && num <= 10) return "bg-[#fbc400] text-black"; // 노란색
+  if (num >= 11 && num <= 20) return "bg-[#69c8f2] text-black"; // 파란색
+  if (num >= 21 && num <= 30) return "bg-[#ff7272] text-white"; // 빨간색
+  if (num >= 31 && num <= 40) return "bg-[#aaa] text-white"; // 회색
+  return "bg-[#b0d840] text-black"; // 초록색 (41 이상)
 }

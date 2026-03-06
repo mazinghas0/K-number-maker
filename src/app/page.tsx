@@ -200,7 +200,7 @@ export default function Home() {
               {numbers.length === 0 ? <div className="text-[120px] opacity-10 animate-float drop-shadow-2xl">☯️</div> : (
                 <div className="flex flex-wrap justify-center gap-5 relative z-10">
                   {numbers.map((n, i) => (
-                    <div key={i} className={`w-20 h-20 rounded-full flex items-center justify-center text-3xl font-black shadow-2xl transition-all duration-500 ${i < visibleCount ? "animate-pop-bounce" : "scale-0 opacity-0 hidden"} ${getBallColor(n, selectedLotto.max)}`} style={{ boxShadow: "inset -4px -4px 10px rgba(0,0,0,0.3), 0 15px 30px rgba(0,0,0,0.4)" }}>
+                    <div key={i} className={`w-20 h-20 rounded-full flex items-center justify-center text-3xl font-black shadow-2xl transition-all duration-500 ${i < visibleCount ? "animate-pop-bounce scale-100 opacity-100" : "scale-0 opacity-0 hidden"} ${getBallColor(n)}`} style={{ boxShadow: "inset -4px -4px 10px rgba(0,0,0,0.3), 0 15px 30px rgba(0,0,0,0.4)" }}>
                       {n}
                     </div>
                   ))}
@@ -226,12 +226,12 @@ export default function Home() {
               </form>
             </div>
           ) : (
-            <OracleChat lang={lang} userProfile={userProfile} luckyElement={luckyElement} isGenerating={isGenerating} onGenerate={handleOracleGenerate} />
+            <OracleChat lang={lang} userProfile={userProfile} luckyElement={luckyElement} activeTheme={activeTheme} isGenerating={isGenerating} onGenerate={handleOracleGenerate} />
           )
         )}
 
         {activeTab === "board" && (
-          <FortuneBoard lang={lang} board={board} onBless={handleBless} />
+          <FortuneBoard lang={lang} board={board} activeTheme={activeTheme} onBless={handleBless} />
         )}
 
         {activeTab === "history" && (

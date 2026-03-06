@@ -1,17 +1,18 @@
 "use client";
 
 import React from "react";
-import { Lang, BoardItem } from "@/lib/types";
+import { Lang, BoardItem, ThemeColors } from "@/lib/types";
 import { TRANSLATIONS } from "@/lib/translations";
 import { getBallColor } from "@/lib/fortuneEngine";
 
 interface Props {
   lang: Lang;
   board: BoardItem[];
+  activeTheme: ThemeColors;
   onBless: (id: string) => Promise<void>;
 }
 
-export default function FortuneBoard({ lang, board, onBless }: Props) {
+export default function FortuneBoard({ lang, board, activeTheme, onBless }: Props) {
   const t = TRANSLATIONS[lang];
 
   return (
@@ -33,7 +34,7 @@ export default function FortuneBoard({ lang, board, onBless }: Props) {
               className={`relative overflow-hidden p-10 rounded-[3.5rem] border transition-all duration-500 hover:scale-[1.01] shadow-2xl ${
                 idx === 0 
                   ? 'bg-gradient-to-br from-yellow-500/10 to-transparent border-yellow-500/50 shadow-yellow-500/20' 
-                  : 'bg-white/5 border-white/10'
+                  : `${activeTheme.card} border-white/5`
               }`}
             >
               {idx === 0 && (
@@ -48,7 +49,7 @@ export default function FortuneBoard({ lang, board, onBless }: Props) {
                     👤
                   </div>
                   <div>
-                    <span className={`text-lg font-black italic ${idx === 0 ? 'text-yellow-500' : 'text-blue-400'}`}>@{post.user_name}</span>
+                    <span className={`text-lg font-black italic ${idx === 0 ? 'text-yellow-500' : activeTheme.accent}`}>@{post.user_name}</span>
                     <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">{new Date(post.created_at).toLocaleDateString()}</p>
                   </div>
                 </div>

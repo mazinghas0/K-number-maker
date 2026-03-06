@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { Lang, ChatMessage, UserProfile, ElementInfo } from "@/lib/types";
+import { Lang, ChatMessage, UserProfile, ElementInfo, ThemeColors } from "@/lib/types";
 import { TRANSLATIONS } from "@/lib/translations";
 import { getBallColor } from "@/lib/fortuneEngine";
 
@@ -9,6 +9,7 @@ interface Props {
   lang: Lang;
   userProfile: UserProfile;
   luckyElement: ElementInfo;
+  activeTheme: ThemeColors;
   isGenerating: boolean;
   onGenerate: () => Promise<void>;
 }
@@ -21,7 +22,7 @@ const MOODS = [
   { emoji: "🤩", label: "Excited" }
 ];
 
-export default function OracleChat({ lang, userProfile, luckyElement, isGenerating, onGenerate }: Props) {
+export default function OracleChat({ lang, userProfile, luckyElement, activeTheme, isGenerating, onGenerate }: Props) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [zoom, setZoom] = useState(1.0);
   const chatEndRef = useRef<HTMLDivElement>(null);
@@ -75,7 +76,7 @@ export default function OracleChat({ lang, userProfile, luckyElement, isGenerati
           {messages.map(msg => (
             <div key={msg.id} className={`flex w-full ${msg.sender === "user" ? "justify-end" : "justify-start"}`}>
               {msg.sender === "oracle" && <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-xl mr-3 shadow-lg">🤖</div>}
-              <div className={`max-w-[85%] rounded-[2rem] p-6 shadow-xl ${msg.sender === "user" ? "bg-blue-600 text-white rounded-br-none" : "bg-white dark:bg-neutral-900 border border-white/5 text-inherit rounded-bl-none"}`}>
+              <div className={`max-w-[85%] rounded-[2rem] p-6 shadow-xl ${msg.sender === "user" ? activeTheme.primary + " text-white rounded-br-none" : "bg-white dark:bg-neutral-900 border border-white/5 text-inherit rounded-bl-none"}`}>
                 {msg.type === "text" && <p className="text-lg font-bold leading-relaxed">{msg.text}</p>}
                 
                 {msg.type === "mood-selector" && (
@@ -89,7 +90,7 @@ export default function OracleChat({ lang, userProfile, luckyElement, isGenerati
                 )}
                 
                 {msg.type === "action-generate" && (
-                  <button onClick={onGenerate} disabled={isGenerating} className="mt-4 w-full bg-blue-600 text-white font-black py-5 rounded-3xl text-sm uppercase tracking-widest shadow-2xl hover:brightness-110 transition-all active:scale-95">
+                  <button onClick={onGenerate} disabled={isGenerating} className={`mt-4 w-full ${activeTheme.primary} text-white font-black py-5 rounded-3xl text-sm uppercase tracking-widest shadow-2xl hover:brightness-110 transition-all active:scale-95`}>
                     {isGenerating ? "..." : msg.text}
                   </button>
                 )}
@@ -100,7 +101,7 @@ export default function OracleChat({ lang, userProfile, luckyElement, isGenerati
                     <p className="text-base font-bold italic leading-relaxed text-gray-400">"{msg.story}"</p>
                     <div className="flex flex-wrap gap-3 pt-2">
                       {msg.numbers?.map((n, idx) => (
-                        <div key={idx} className={`w-12 h-12 rounded-full flex items-center justify-center text-sm font-black shadow-lg ${getBallColor(n)}`}>
+                        <div key={idx} className={`w-12 h-12 rounded-full flex items-center justify-center text-sm font-black shadow-lg animate-pop-bounce ${getBallColor(n)}`}>
                           {n}
                         </div>
                       ))}
