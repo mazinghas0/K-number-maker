@@ -13,7 +13,6 @@ import HistoryTab from "@/components/HistoryTab";
 import AgentTab from "@/components/AgentTab";
 import FortuneBoard from "@/components/FortuneBoard";
 import AlarmSettings from "@/components/AlarmSettings";
-import ShareModal from "@/components/ShareModal";
 
 export default function Home() {
   const [lang, setLang] = useState<Lang>("ko");
@@ -27,7 +26,6 @@ export default function Home() {
   const [selectedLotto, setSelectedLotto] = useState(LOTTERY_PRESETS[0]);
   const [customSettings, setCustomSettings] = useState({ count: 6, max: 45 });
   const [user, setUser] = useState<User | null>(null);
-  const [boardMessage, setBoardMessage] = useState("");
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [tempProfile, setTempProfile] = useState<UserProfile>({ name: "", birthDate: "", birthTime: "" });
   const [showSidebar, setShowSidebar] = useState(false);
@@ -121,18 +119,6 @@ export default function Home() {
     triggerHaptic();
     await supabase.rpc("increment_blessings", { post_id: id });
     fetchBoard();
-  };
-
-  const handlePostToBoard = async () => {
-    if (!user || numbers.length === 0) return;
-    triggerHaptic();
-    const { error } = await supabase.from("fortune_board").insert([{
-      user_id: user.id,
-      user_name: userProfile?.name || "Seeker",
-      content: boardMessage || "May luck be with you!",
-      lucky_numbers: numbers,
-    }]);
-    if (!error) { setBoardMessage(""); setNumbers([]); fetchBoard(); setActiveTab("board"); }
   };
 
   const handleProfileSubmit = (p: UserProfile) => {
@@ -229,19 +215,6 @@ export default function Home() {
           </button>
         ))}
       </nav>
-
-      <ShareModal
-        numbers={numbers}
-        onClose={() => setNumbers([])}
-        isGenerating={isGenerating}
-        luckyElement={luckyElement}
-        userProfile={userProfile}
-        boardMessage={boardMessage}
-        onBoardMessageChange={setBoardMessage}
-        onPostToBoard={handlePostToBoard}
-        activeTheme={activeTheme}
-        t={t}
-      />
 
       <style jsx global>{`
         @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-15px); } 100% { transform: translateY(0px); } }
