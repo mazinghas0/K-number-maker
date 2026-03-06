@@ -39,14 +39,14 @@ const TRANSLATIONS: Record<Lang, Translation> = {
     postBoard: "광장에 자랑하기", boardTitle: "행운 광장", writeMessage: "행운의 한마디...", send: "전송",
   },
   ja: {
-    title: "K-運勢", subtitle: "神秘的な占いの館", invoke: "番号生成", records: "幸運の記録", oracle: "運勢診断", board: "幸運広場",
-    login: "ログイン", logout: "ログアウト", generateLuck: "幸運を呼ぶ", invoking: "パワー集中中...",
-    selectMode: "運命のモード選択", numCount: "数字の数", range: "範囲", connected: "運命が繋がった",
-    noRecords: "記録がありません。", resetProfile: "リセット", awakenDestiny: "運命を呼び覚ます",
-    oracleGuide: "生年月日を入力してください", nameLabel: "名前",
-    dateLabel: "生年月日", startOracle: "診断開始", luckyArea: "ラッキーエリア",
-    luckIndex: "今日の運勢", shareTitle: "運命のカード", close: "閉じる", elementAnalysis: "五行エネルギーバランス",
-    postBoard: "広場でシェア", boardTitle: "幸運広場", writeMessage: "一言メッセージ...", send: "送信",
+    title: "K-運勢", subtitle: "神秘的な占いの館", invoke: "번호 생성", records: "幸運の記録", oracle: "運勢診断", board: "幸運広場",
+    login: "로그인", logout: "로그아웃", generateLuck: "幸運を呼ぶ", invoking: "パワー集中중...",
+    selectMode: "운명의 모드 선택", numCount: "숫자의 수", range: "범위", connected: "운명이 繋가났다",
+    noRecords: "기록이 없습니다.", resetProfile: "리셋", awakenDestiny: "운명을 깨우다",
+    oracleGuide: "생년월일을 입력해 주세요", nameLabel: "이름",
+    dateLabel: "생년월일", startOracle: "진단 시작", luckyArea: "라키 에리어",
+    luckIndex: "오늘의 운세", shareTitle: "운명의 카드", close: "닫기", elementAnalysis: "五行에너지 밸런스",
+    postBoard: "광장에서 쉐어", boardTitle: "행운 광장", writeMessage: "한마디 메시지...", send: "전송",
   },
   es: {
     title: "K-Fortuna", subtitle: "Oráculo Místico", invoke: "Invocar", records: "Registros", oracle: "Oráculo", board: "Plaza",
@@ -73,9 +73,7 @@ interface LotteryPreset {
   id: string; name: string; count: number; max: number; country: string;
 }
 
-interface UserProfile {
-  name: string; birthDate: string; birthTime: string;
-}
+interface UserProfile { name: string; birthDate: string; birthTime: string; }
 
 interface ElementInfo {
   name: string; symbol: string; color: string; bg: string;
@@ -103,28 +101,28 @@ const ELEMENTS: ElementInfo[] = [
     name: "Fire", symbol: "火", color: "text-red-500", bg: "bg-red-500/10", desc: "열정과 확산", range: [11, 20],
     messages: [
       { en: "Passion lights your way. Mid-range energy is high.", ko: "열정이 길을 밝힙니다. 중간 번호대의 에너지가 높습니다.", ja: "情熱が道を照らします。中間の番号に力が宿ります。", es: "La pasión ilumina tu camino. Energía media es alta." },
-      { en: "The sun peaks. Hot numbers are calling you.", ko: "태양이 정점입니다. 뜨거운 번호들이 당신을 부릅니다.", ja: "太陽が頂点です。熱い数字があなたを呼んでいます。", es: "El sol está en su cenit. Los números calientes te llaman." }
+      { en: "The sun peaks. Hot numbers are calling you.", ko: "태양이 정점입니다. 뜨거운 번호들이 당신을 부릅니다.", ja: "太陽が頂点です. 熱い数字があなたを呼んでいます.", es: "El sol está en su cenit. Los números calientes te llaman." }
     ]
   },
   { 
     name: "Earth", symbol: "土", color: "text-yellow-600", bg: "bg-yellow-600/10", desc: "안정과 균형", range: [21, 30],
     messages: [
-      { en: "Stability brings luck. Core numbers are strong.", ko: "안정이 행운을 부릅니다. 중심 번호들이 강력합니다.", ja: "安定が幸運を呼びます。中心の番号が強いです。", es: "La estabilidad trae suerte. Los números centrales son fuertes." },
-      { en: "Firm foundation today. Balance is your weapon.", ko: "기초가 탄튼한 날입니다. 균형이 당신의 무기입니다.", ja: "土台がしっかりした日です。バランスが武器です。", es: "Cimientos firmos hoy. El equilibrio es tu arma." }
+      { en: "Stability brings luck. Core numbers are strong.", ko: "안정이 행운을 부릅니다. 중심 번호들이 강력합니다.", ja: "安定が幸運を呼びます. 中心の番号が強いです.", es: "La estabilidad trae suerte. Los números centrales son fuertes." },
+      { en: "Firm foundation today. Balance is your weapon.", ko: "기초가 탄튼한 날입니다. 균형이 당신의 무기입니다.", ja: "土台がしっかりした日です. バランスが武器です.", es: "Cimientos firmos hoy. El equilibrio es tu arma." }
     ]
   },
   { 
     name: "Metal", symbol: "金", color: "text-gray-400", bg: "bg-gray-400/10", desc: "결단과 결실", range: [31, 40],
     messages: [
-      { en: "Intuition leads to gold. Aim for high precision.", ko: "직관이 금빛 결실을 맺습니다. 높은 번호대를 공략하세요.", ja: "直感が実を結びます。高い番号帯を狙ってください。", es: "La intuición lleva al oro. Apunta a números altos." },
-      { en: "Sharpness is strength. Solid choices bring victory.", ko: "날카로움이 힘입니다. 단단한 선택이 승리를 부릅니다.", ja: "鋭さが力です。堅実な選択が勝利を呼びます。", es: "La agudeza es fuerza. Decisiones sólidas traen victoria." }
+      { en: "Intuition leads to gold. Aim for high precision.", ko: "직관이 금빛 결실을 맺습니다. 높은 번호대를 공략하세요.", ja: "直感が実を結びます. 高い番号帯を狙ってください.", es: "La intuición lleva al oro. Apunta a números altos." },
+      { en: "Sharpness is strength. Solid choices bring victory.", ko: "날카로움이 힘입니다. 단단한 선택이 승리를 부릅니다.", ja: "鋭さが力です. 堅実な選択が勝利を呼びます.", es: "La agudeza es fuerza. Decisiones sólidas traen victoria." }
     ]
   },
   { 
     name: "Water", symbol: "水", color: "text-blue-500", bg: "bg-blue-500/10", desc: "지혜와 유연함", range: [41, 50],
     messages: [
-      { en: "Wisdom flows deep. Highest range carries power.", ko: "지혜가 깊게 흐릅니다. 가장 높은 번호대에 힘이 있습니다.", ja: "知恵が深く流れています。最高位の番号に力があります。", es: "La sabiduría fluye profundo. El rango más alto tiene poder." },
-      { en: "Adaptability is key. Let luck drift naturally.", ko: "유연함이 핵심입니다. 행운이 자연스럽게 흐르게 두세요.", ja: "柔軟さが鍵です。運の流れに身を任せましょう。", es: "La adaptabilidad es clave. Deja que la suerte fluya." }
+      { en: "Wisdom flows deep. Highest range carries power.", ko: "지혜가 깊게 흐릅니다. 가장 높은 번호대에 힘이 있습니다.", ja: "知恵が深く流れています. 最高位の番号に力があります.", es: "La sabiduría fluye profundo. El rango más alto tiene poder." },
+      { en: "Adaptability is key. Let luck drift naturally.", ko: "유연함이 핵심입니다. 행운이 자연스럽게 흐르게 두세요.", ja: "柔軟さが鍵です. 運の流れに身を任せましょう.", es: "La adaptabilidad es clave. Deja que la suerte fluya." }
     ]
   },
 ];
@@ -258,6 +256,17 @@ export default function Home() {
     }
   };
 
+  const finalShareLuck = async () => {
+    triggerHaptic();
+    const text = `🍀 ${t.title} Fortune 🍀\n\n[${selectedLotto.name}]\n${numbers.join(", ")}\n\n${t.subtitle}\n${window.location.origin}`;
+    if (navigator.share) {
+      await navigator.share({ title: t.title, text: text });
+    } else {
+      await navigator.clipboard.writeText(text);
+      alert(lang === "ko" ? "메시지가 복사되었습니다!" : "Luck message copied!");
+    }
+  };
+
   return (
     <>
       <header className="px-6 py-8 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center sticky top-0 bg-white/95 dark:bg-black/95 backdrop-blur-md z-10">
@@ -299,11 +308,11 @@ export default function Home() {
               <section className="bg-gray-50 dark:bg-neutral-900/50 p-8 rounded-[2.5rem] space-y-8 border border-gray-100 dark:border-neutral-800">
                 <div className="space-y-4">
                   <div className="flex justify-between items-center font-black text-gray-400 uppercase tracking-widest text-xs"><span>{t.numCount}</span><span className="text-blue-600 text-base">{customCount}</span></div>
-                  <input type="range" min="3" max="10" value={customCount} onChange={(e) => setCustomCount(parseInt(e.target.value))} className="w-full h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600" />
+                  <input type="range" min="3" max="10" value={customCount} onChange={(e) => setCustomCount(parseInt(e.target.value))} className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600" />
                 </div>
                 <div className="space-y-4">
                   <div className="flex justify-between items-center font-black text-gray-400 uppercase tracking-widest text-xs"><span>{t.range}</span><span className="text-blue-600 text-base">1 ~ {customMax}</span></div>
-                  <input type="range" min="30" max="70" value={customMax} onChange={(e) => setCustomMax(parseInt(e.target.value))} className="w-full h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600" />
+                  <input type="range" min="30" max="70" value={customMax} onChange={(e) => setCustomMax(parseInt(e.target.value))} className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600" />
                 </div>
               </section>
             )}
@@ -401,14 +410,9 @@ export default function Home() {
               ) : (
                 board.map((post) => (
                   <div key={post.id} className="bg-white dark:bg-neutral-900 border border-gray-100 dark:border-neutral-800 p-8 rounded-[3rem] shadow-sm space-y-6">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm font-black text-blue-600 uppercase tracking-tighter italic">@{post.user_name}</span>
-                      <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{new Date(post.created_at).toLocaleDateString()}</span>
-                    </div>
+                    <div className="flex justify-between items-center"><span className="text-sm font-black text-blue-600 uppercase tracking-tighter italic">@{post.user_name}</span><span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{new Date(post.created_at).toLocaleDateString()}</span></div>
                     <p className="text-lg font-bold leading-snug text-gray-800 dark:text-gray-100 italic">"{post.content}"</p>
-                    <div className="flex gap-2 flex-wrap">
-                      {post.lucky_numbers.map((num, i) => ( <div key={i} className={`w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-black shadow-sm ${getBallColor(num, 70)}`}>{num}</div> ))}
-                    </div>
+                    <div className="flex gap-2 flex-wrap">{post.lucky_numbers.map((num, i) => ( <div key={i} className={`w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-black shadow-sm ${getBallColor(num, 70)}`}>{num}</div> ))}</div>
                   </div>
                 ))
               )}
@@ -422,17 +426,11 @@ export default function Home() {
           <div className="absolute inset-0 bg-black/80 backdrop-blur-xl" onClick={() => setShowShareModal(false)}></div>
           <div className="relative w-full max-w-sm bg-gradient-to-b from-neutral-900 to-black rounded-[3.5rem] shadow-[0_0_100px_rgba(37,99,235,0.3)] overflow-hidden border border-white/10 flex flex-col p-10 gap-8 animate-in zoom-in duration-500">
             <div className="text-center space-y-2"><h3 className="text-2xl font-black italic tracking-tight text-white">{t.shareTitle}</h3><p className="text-[10px] text-blue-400 font-black uppercase tracking-[0.4em]">{t.subtitle}</p></div>
-            <div className={`p-8 rounded-[2.5rem] ${luckyElement.bg} border border-white/5 relative overflow-hidden text-center`}>
-              <span className={`text-8xl font-serif opacity-20 ${luckyElement.color} absolute left-1/2 -translate-x-1/2 -top-4`}>{luckyElement.symbol}</span>
-              <div className="relative z-10 space-y-6"><p className="text-xs font-black text-gray-400 uppercase tracking-widest">{userProfile?.name || "Seeker"}'s Luck</p><div className="flex justify-center gap-3 flex-wrap">{numbers.map((num, i) => ( <div key={i} className={`w-10 h-10 rounded-full flex items-center justify-center text-xs font-black ${getBallColor(num, 70)} shadow-lg`}>{num}</div> ))}</div><p className="text-sm font-bold italic text-white/80">"May the cosmos align in your favor."</p></div>
-            </div>
+            <div className={`p-8 rounded-[2.5rem] ${luckyElement.bg} border border-white/5 relative overflow-hidden text-center`}><span className={`text-8xl font-serif opacity-20 ${luckyElement.color} absolute left-1/2 -translate-x-1/2 -top-4`}>{luckyElement.symbol}</span><div className="relative z-10 space-y-6"><p className="text-xs font-black text-gray-400 uppercase tracking-widest">{userProfile?.name || "Seeker"}'s Luck</p><div className="flex justify-center gap-3 flex-wrap">{numbers.map((num, i) => ( <div key={i} className={`w-10 h-10 rounded-full flex items-center justify-center text-xs font-black ${getBallColor(num, 70)} shadow-lg`}>{num}</div> ))}</div><p className="text-sm font-bold italic text-white/80">"May the cosmos align in your favor."</p></div></div>
             {user ? (
-              <div className="space-y-4">
-                <input type="text" placeholder={t.writeMessage} className="w-full px-6 py-4 rounded-2xl bg-white/5 border border-white/10 text-white text-sm font-bold" value={boardMessage} onChange={(e) => setBoardMessage(e.target.value)} />
-                <button onClick={handlePostToBoard} className="w-full bg-blue-600 text-white font-black py-5 rounded-[2rem] shadow-xl text-sm uppercase tracking-widest">{t.postBoard}</button>
-              </div>
+              <div className="space-y-4"><input type="text" placeholder={t.writeMessage} className="w-full px-6 py-4 rounded-2xl bg-white/5 border border-white/10 text-white text-sm font-bold focus:ring-2 focus:ring-blue-500" value={boardMessage} onChange={(e) => setBoardMessage(e.target.value)} /><button onClick={handlePostToBoard} className="w-full bg-blue-600 text-white font-black py-5 rounded-[2rem] shadow-xl text-sm uppercase tracking-widest active:scale-95 transition-all">{t.postBoard}</button></div>
             ) : (
-              <button onClick={finalShare} className="w-full bg-blue-600 text-white font-black py-5 rounded-[2rem] shadow-xl text-sm uppercase tracking-widest active:scale-95 transition-all">Send Fortune</button>
+              <button onClick={finalShareLuck} className="w-full bg-blue-600 text-white font-black py-5 rounded-[2rem] shadow-xl text-sm uppercase tracking-widest active:scale-95 transition-all">Send Fortune</button>
             )}
             <button onClick={() => setShowShareModal(false)} className="w-full py-4 text-[10px] text-gray-500 font-black uppercase tracking-[0.2em]">{t.close}</button>
           </div>
