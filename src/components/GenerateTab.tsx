@@ -1,18 +1,19 @@
 "use client";
 
 import React from "react";
-import { Lang, LotteryPreset, ThemeColors, Translation } from "@/lib/types";
+import { LotteryPreset, ThemeColors, Translation, AnimPhase } from "@/lib/types";
 import { LOTTERY_PRESETS } from "@/lib/constants";
 import { getBallColor } from "@/lib/fortuneEngine";
 
 interface Props {
-  lang: Lang;
   selectedLotto: LotteryPreset;
   onLottoChange: (lotto: LotteryPreset) => void;
   customSettings: { count: number; max: number };
   onCustomChange: (settings: { count: number; max: number }) => void;
   numbers: number[];
-  visibleCount: number;
+  shuffledNums: number[];
+  revealCount: number;
+  animPhase: AnimPhase;
   isGenerating: boolean;
   activeTheme: ThemeColors;
   t: Translation;
@@ -21,29 +22,49 @@ interface Props {
 
 export default function GenerateTab({
   selectedLotto, onLottoChange, customSettings, onCustomChange,
-  numbers, visibleCount, isGenerating, activeTheme, t, onGenerate,
+  numbers, shuffledNums, revealCount, animPhase, isGenerating, activeTheme, t, onGenerate,
 }: Props) {
+  // 표시할 번호 결정: 정렬 페이즈는 sorted, 스캐터 페이즈는 순차 공개
+  const displayNums: number[] = animPhase === "sort" ? numbers : shuffledNums.slice(0, revealCount);
+
   return (
     <div className="flex flex-col gap-10 animate-in fade-in duration-500">
+
+      {/* 복권 종류 선택 */}
       <div className="grid grid-cols-2 gap-5">
-        {LOTTERY_PRESETS.map(l => (
-          <button
-            key={l.id}
-            onClick={() => onLottoChange(l)}
-            className={`p-8 rounded-[2.5rem] border-2 transition-all hover:scale-[1.03] shadow-lg flex flex-col items-center gap-3 ${
-              selectedLotto.id === l.id
-                ? activeTheme.primary + " border-transparent text-white shadow-blue-500/20"
-                : "bg-white/5 border-white/10 text-gray-500"
-            }`}
-          >
-            <span className="text-5xl drop-shadow-md">{l.country}</span>
-            <p className="text-sm font-black uppercase tracking-widest">{l.name}</p>
-          </button>
-        ))}
+        {LOTTERY_PRESETS.map(l => {
+          const isSelected = selectedLotto.id === l.id;
+          return (
+            <button
+              key={l.id}
+              onClick={() => onLottoChange(l)}
+              className={`p-8 rounded-[2.5rem] border-2 transition-all duration-300 hover:scale-[1.03] flex flex-col items-center gap-3 ${
+                isSelected
+                  ? activeTheme.primary + " border-transparent text-white"
+                  : "bg-white/5 border-white/10 text-gray-500 hover:border-white/20 hover:bg-white/8"
+              }`}
+              style={{
+                boxShadow: isSelected
+                  ? "0 20px 40px rgba(37,99,235,0.25), 0 8px 16px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.15)"
+                  : "0 4px 20px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.04)",
+                transform: isSelected ? "translateY(-3px)" : "translateY(0)",
+              }}
+            >
+              <span className="text-5xl drop-shadow-md">{l.country}</span>
+              <p className="text-sm font-black uppercase tracking-widest">{l.name}</p>
+            </button>
+          );
+        })}
       </div>
 
+      {/* 커스텀 설정 */}
       {selectedLotto.id === "custom" && (
-        <div className={`${activeTheme.card} p-10 rounded-[3rem] border border-white/5 space-y-10 animate-in zoom-in duration-300`}>
+        <div
+          className={`${activeTheme.card} p-10 rounded-[3rem] border border-white/5 space-y-10 animate-in zoom-in duration-300`}
+          style={{
+            boxShadow: "0 10px 40px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.05), inset 0 -1px 0 rgba(0,0,0,0.1)",
+          }}
+        >
           <div className="space-y-4">
             <div className="flex justify-between items-center px-2">
               <span className="text-xs font-black text-blue-500 uppercase tracking-widest">{t.numCount}</span>
@@ -69,31 +90,103 @@ export default function GenerateTab({
         </div>
       )}
 
-      <section className={`${activeTheme.card} rounded-[4rem] p-14 min-h-[360px] flex flex-col items-center justify-center border border-white/5 shadow-[inset_0_0_50px_rgba(0,0,0,0.2)] relative overflow-hidden group`}>
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(37,99,235,0.05)_0%,transparent_70%)]" />
-        {numbers.length === 0 ? (
-          <div className="text-[120px] opacity-10 animate-float drop-shadow-2xl">☯️</div>
+      {/* 공 표시 영역 */}
+      <section
+        className={`${activeTheme.card} rounded-[4rem] p-14 min-h-[360px] flex flex-col items-center justify-center border border-white/5 relative overflow-hidden`}
+        style={{
+          boxShadow:
+            "inset 0 3px 30px rgba(0,0,0,0.35), inset 0 -1px 0 rgba(255,255,255,0.03), 0 30px 60px rgba(0,0,0,0.25)",
+        }}
+      >
+        {/* 위쪽 ambient light */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              "radial-gradient(ellipse at 50% 0%, rgba(37,99,235,0.08) 0%, transparent 65%)",
+          }}
+        />
+        {/* 아래쪽 그림자 floor */}
+        <div
+          className="absolute bottom-0 left-0 right-0 h-20 pointer-events-none"
+          style={{
+            background:
+              "linear-gradient(to top, rgba(0,0,0,0.15) 0%, transparent 100%)",
+          }}
+        />
+
+        {displayNums.length === 0 ? (
+          <div className="text-[120px] opacity-10 animate-float drop-shadow-2xl select-none">☯️</div>
         ) : (
           <div className="flex flex-wrap justify-center gap-5 relative z-10">
-            {numbers.map((n, i) => (
-              <div
-                key={i}
-                className={`w-20 h-20 rounded-full flex items-center justify-center text-3xl font-black shadow-2xl transition-all duration-500 ${
-                  i < visibleCount ? "animate-pop-bounce scale-100 opacity-100" : "scale-0 opacity-0 hidden"
-                } ${getBallColor(n)}`}
-                style={{ boxShadow: "inset -4px -4px 10px rgba(0,0,0,0.3), 0 15px 30px rgba(0,0,0,0.4)" }}
-              >
-                {n}
-              </div>
-            ))}
+            {displayNums.map((num) => {
+              const sortedIdx = numbers.indexOf(num);
+              const ballAnimation: React.CSSProperties =
+                animPhase === "sort"
+                  ? {
+                      animation: `ballBounce 0.55s cubic-bezier(0.34,1.56,0.64,1) ${sortedIdx * 0.07}s both`,
+                    }
+                  : {
+                      animation: "ballPop 0.5s cubic-bezier(0.34,1.56,0.64,1) both",
+                    };
+
+              const ballStyle: React.CSSProperties = {
+                boxShadow:
+                  "inset -5px -7px 14px rgba(0,0,0,0.38), inset 3px 4px 8px rgba(255,255,255,0.32), 0 18px 38px rgba(0,0,0,0.48), 0 5px 10px rgba(0,0,0,0.22)",
+                ...ballAnimation,
+              };
+
+              return (
+                <div
+                  key={num}
+                  className={`relative w-20 h-20 rounded-full flex items-center justify-center ${getBallColor(num)}`}
+                  style={ballStyle}
+                >
+                  {/* 상단 하이라이트 — 3D 구체 효과 */}
+                  <div
+                    className="absolute inset-0 rounded-full pointer-events-none"
+                    style={{
+                      background:
+                        "radial-gradient(circle at 34% 27%, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.18) 38%, transparent 62%)",
+                    }}
+                  />
+                  {/* 하단 그림자 — 깊이감 */}
+                  <div
+                    className="absolute inset-0 rounded-full pointer-events-none"
+                    style={{
+                      background:
+                        "radial-gradient(circle at 66% 73%, rgba(0,0,0,0.32) 0%, transparent 52%)",
+                    }}
+                  />
+                  {/* 좌측 반사광 — 실물 공 질감 */}
+                  <div
+                    className="absolute inset-0 rounded-full pointer-events-none"
+                    style={{
+                      background:
+                        "radial-gradient(circle at 18% 55%, rgba(255,255,255,0.12) 0%, transparent 35%)",
+                    }}
+                  />
+                  <span className="relative z-10 text-2xl font-black drop-shadow-sm select-none">
+                    {num}
+                  </span>
+                </div>
+              );
+            })}
           </div>
         )}
       </section>
 
+      {/* 생성 버튼 */}
       <button
         onClick={onGenerate}
         disabled={isGenerating}
-        className={`w-full py-10 rounded-[3rem] font-black text-3xl ${activeTheme.primary} text-white shadow-[0_20px_50px_rgba(37,99,235,0.3)] hover:brightness-110 active:scale-95 transition-all uppercase tracking-[0.2em]`}
+        className={`w-full py-10 rounded-[3rem] font-black text-3xl ${activeTheme.primary} text-white hover:brightness-110 active:scale-95 transition-all uppercase tracking-[0.2em]`}
+        style={{
+          boxShadow: isGenerating
+            ? "none"
+            : "0 20px 50px rgba(37,99,235,0.38), 0 8px 20px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.12), inset 0 -2px 0 rgba(0,0,0,0.15)",
+          transform: isGenerating ? "scale(0.98)" : "scale(1)",
+        }}
       >
         {isGenerating ? t.invoking : t.generateLuck}
       </button>

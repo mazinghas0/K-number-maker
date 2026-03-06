@@ -1,6 +1,7 @@
 export type Lang = "en" | "ko" | "ja" | "es";
 export type TabType = "generate" | "history" | "agent" | "board" | "rules" | "alarms" | "settings";
 export type ThemeType = "dark" | "gold" | "paper" | "aurora";
+export type AnimPhase = "idle" | "scatter" | "sort";
 
 export interface Translation {
   title: string; subtitle: string; invoke: string; records: string; oracle: string; board: string;

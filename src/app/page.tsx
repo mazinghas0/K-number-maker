@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { supabase } from "@/lib/supabase";
 import { User } from "@supabase/supabase-js";
-import { Lang, TabType, ThemeType, HistoryItem, BoardItem, UserProfile, AlarmsState } from "@/lib/types";
+import { Lang, TabType, ThemeType, HistoryItem, BoardItem, UserProfile, AlarmsState, AnimPhase } from "@/lib/types";
 import { TRANSLATIONS } from "@/lib/translations";
 import { analyzeDestiny } from "@/lib/fortuneEngine";
 import { LOTTERY_PRESETS, THEMES } from "@/lib/constants";
@@ -19,7 +19,9 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<TabType>("generate");
   const [theme, setTheme] = useState<ThemeType>("dark");
   const [numbers, setNumbers] = useState<number[]>([]);
-  const [visibleCount, setVisibleCount] = useState(0);
+  const [shuffledNums, setShuffledNums] = useState<number[]>([]);
+  const [revealCount, setRevealCount] = useState(0);
+  const [animPhase, setAnimPhase] = useState<AnimPhase>("idle");
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [board, setBoard] = useState<BoardItem[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -79,20 +81,43 @@ export default function Home() {
   }, [user, fetchHistory, fetchBoard]);
 
   const handleGenerate = async () => {
-    triggerHaptic(); setIsGenerating(true); setVisibleCount(0); setNumbers([]);
+    triggerHaptic();
+    setIsGenerating(true);
+    setNumbers([]);
+    setShuffledNums([]);
+    setRevealCount(0);
+    setAnimPhase("idle");
+
     setTimeout(async () => {
       const gs = new Set<number>();
       const m = selectedLotto.id === "custom" ? customSettings.max : selectedLotto.max;
       const count = selectedLotto.id === "custom" ? customSettings.count : selectedLotto.count;
       while (gs.size < count) gs.add(Math.floor(Math.random() * m) + 1);
       const sorted = Array.from(gs).sort((a, b) => a - b);
+      const shuffled = [...sorted].sort(() => Math.random() - 0.5);
+
       setNumbers(sorted);
-      sorted.forEach((_, i) => setTimeout(() => { setVisibleCount(i + 1); triggerHaptic(); }, (i + 1) * 150));
+      setShuffledNums(shuffled);
+      setAnimPhase("scatter");
+
       if (user) {
         await supabase.from("lotto_history").insert([{ numbers: sorted, mode: selectedLotto.name, user_id: user.id }]);
         fetchHistory();
       }
       setIsGenerating(false);
+
+      // 공 하나씩 랜덤 순서로 등장
+      shuffled.forEach((_, i) => {
+        setTimeout(() => {
+          setRevealCount(c => c + 1);
+          triggerHaptic();
+        }, (i + 1) * 180);
+      });
+
+      // 전부 등장 후 정렬 페이즈 전환
+      setTimeout(() => {
+        setAnimPhase("sort");
+      }, (count + 3) * 180);
     }, 800);
   };
 
@@ -163,13 +188,14 @@ export default function Home() {
       <main className="flex-1 overflow-y-auto px-8 py-10 pb-48">
         {activeTab === "generate" && (
           <GenerateTab
-            lang={lang}
             selectedLotto={selectedLotto}
             onLottoChange={(l) => { setSelectedLotto(l); setLang(l.defaultLang); }}
             customSettings={customSettings}
             onCustomChange={setCustomSettings}
             numbers={numbers}
-            visibleCount={visibleCount}
+            shuffledNums={shuffledNums}
+            revealCount={revealCount}
+            animPhase={animPhase}
             isGenerating={isGenerating}
             activeTheme={activeTheme}
             t={t}
@@ -221,6 +247,20 @@ export default function Home() {
         .animate-float { animation: float 5s ease-in-out infinite; }
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+        @keyframes ballPop {
+          0%   { transform: scale(0) translateY(-40px); opacity: 0; }
+          55%  { transform: scale(1.28) translateY(6px); opacity: 1; }
+          75%  { transform: scale(0.88) translateY(-3px); }
+          100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+        @keyframes ballBounce {
+          0%   { transform: scale(1) translateY(0); }
+          30%  { transform: scale(1.32) translateY(-14px); }
+          60%  { transform: scale(0.86) translateY(5px); }
+          80%  { transform: scale(1.08) translateY(-3px); }
+          100% { transform: scale(1) translateY(0); }
+        }
       `}</style>
     </div>
   );
