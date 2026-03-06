@@ -197,19 +197,21 @@ export default function Home() {
               ))}
             </div>
             <div className="pt-10 border-t border-white/10">
-              <p className="text-xs font-black text-gray-500 uppercase tracking-widest mb-6">{t.themeLabel}</p>
-              <div className="grid grid-cols-4 gap-4 bg-black/20 p-6 rounded-[2.5rem] border border-white/5">
+              <p className="text-xs font-black opacity-50 uppercase tracking-widest mb-6">{t.themeLabel}</p>
+              <div className="grid grid-cols-4 gap-4 bg-black/5 dark:bg-white/5 p-6 rounded-[2.5rem] border border-black/5 dark:border-white/5 shadow-inner">
                 {(["dark", "gold", "paper", "aurora"] as ThemeType[]).map(th => (
                   <button 
                     key={th} 
                     onClick={() => { setTheme(th); localStorage.setItem("k-fortune-theme", th); }} 
-                    className="flex flex-col items-center gap-3 transition-all"
+                    className="flex flex-col items-center gap-3 transition-all group"
                   >
                     <div 
-                      className={`w-12 h-12 rounded-full border-4 shadow-lg transition-all ${theme === th ? 'border-white scale-110 shadow-white/20' : 'border-transparent opacity-40 hover:opacity-100'}`} 
-                      style={{ backgroundColor: THEME_PREVIEWS[th] }}
-                    />
-                    <span className={`text-[9px] font-black uppercase tracking-tighter ${theme === th ? 'text-white' : 'text-gray-500'}`}>{th}</span>
+                      className={`w-14 h-14 rounded-full border-4 shadow-xl transition-all relative overflow-hidden flex items-center justify-center ${theme === th ? 'border-blue-500 scale-110' : 'border-transparent opacity-60 group-hover:opacity-100'}`}
+                      style={{ backgroundColor: THEMES[th].bg.includes("#") ? THEMES[th].bg.match(/#[a-f0-9]+/i)?.[0] : "#222" }}
+                    >
+                      <div className="w-6 h-6 rounded-full shadow-md" style={{ backgroundColor: THEME_PREVIEWS[th] }} />
+                    </div>
+                    <span className={`text-[9px] font-black uppercase tracking-tighter transition-colors ${theme === th ? 'opacity-100' : 'opacity-40'}`} style={{ color: "inherit" }}>{th}</span>
                   </button>
                 ))}
               </div>
