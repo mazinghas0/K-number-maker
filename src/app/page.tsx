@@ -25,6 +25,13 @@ const THEMES: Record<ThemeType, ThemeColors> = {
   aurora: { bg: "bg-slate-950", text: "text-cyan-50", primary: "bg-fuchsia-600", accent: "text-emerald-400", card: "bg-slate-900/80" }
 };
 
+const THEME_PREVIEWS: Record<ThemeType, string> = {
+  dark: "#2563eb",
+  gold: "#d4af37",
+  paper: "#4a5d23",
+  aurora: "#c026d3"
+};
+
 export default function Home() {
   const [lang, setLang] = useState<Lang>("ko");
   const [activeTab, setActiveTab] = useState<TabType>("generate");
@@ -51,21 +58,6 @@ export default function Home() {
   const triggerHaptic = useCallback(() => {
     if (typeof window !== "undefined" && window.navigator.vibrate) window.navigator.vibrate(15);
   }, []);
-
-  // --- Touch Swipe Logic ---
-  const touchX = useRef<number | null>(null);
-  const handleTouchStart = (e: React.TouchEvent) => { touchX.current = e.touches[0].clientX; };
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    if (!touchX.current) return;
-    const delta = touchX.current - e.changedTouches[0].clientX;
-    const tabs: TabType[] = ["generate", "history", "agent", "board", "alarms"];
-    const idx = tabs.indexOf(activeTab as TabType);
-    if (Math.abs(delta) > 50 && idx !== -1) {
-      if (delta > 0 && idx < tabs.length - 1) setActiveTab(tabs[idx + 1]);
-      if (delta < 0 && idx > 0) setActiveTab(tabs[idx - 1]);
-    }
-    touchX.current = null;
-  };
 
   useEffect(() => {
     const savedLang = localStorage.getItem("k-fortune-lang") as Lang;
@@ -171,7 +163,6 @@ export default function Home() {
   return (
     <div 
       className={`flex flex-col min-h-screen transition-all duration-700 ${activeTheme.bg} ${activeTheme.text}`}
-      onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}
     >
       <header className={`px-8 py-8 flex justify-between items-center sticky top-0 ${activeTheme.bg}/90 backdrop-blur-xl z-30`}>
         <button onClick={() => setShowSidebar(true)} className="p-3 bg-white/10 rounded-full hover:scale-110 transition-transform">
@@ -207,15 +198,18 @@ export default function Home() {
             </div>
             <div className="pt-10 border-t border-white/10">
               <p className="text-xs font-black text-gray-500 uppercase tracking-widest mb-6">{t.themeLabel}</p>
-              <div className="flex justify-between items-center bg-black/20 p-4 rounded-3xl border border-white/5">
+              <div className="grid grid-cols-4 gap-4 bg-black/20 p-6 rounded-[2.5rem] border border-white/5">
                 {(["dark", "gold", "paper", "aurora"] as ThemeType[]).map(th => (
                   <button 
                     key={th} 
                     onClick={() => { setTheme(th); localStorage.setItem("k-fortune-theme", th); }} 
-                    className={`w-12 h-12 rounded-full border-4 shadow-xl transition-all hover:scale-110 flex flex-col items-center relative ${theme === th ? 'border-white scale-110' : 'border-transparent opacity-40'}`} 
-                    style={{ backgroundColor: THEMES[th].primary }}
+                    className="flex flex-col items-center gap-3 transition-all"
                   >
-                    {theme === th && <span className="absolute -bottom-6 text-[8px] font-black uppercase text-white whitespace-nowrap">{th}</span>}
+                    <div 
+                      className={`w-12 h-12 rounded-full border-4 shadow-lg transition-all ${theme === th ? 'border-white scale-110 shadow-white/20' : 'border-transparent opacity-40 hover:opacity-100'}`} 
+                      style={{ backgroundColor: THEME_PREVIEWS[th] }}
+                    />
+                    <span className={`text-[9px] font-black uppercase tracking-tighter ${theme === th ? 'text-white' : 'text-gray-500'}`}>{th}</span>
                   </button>
                 ))}
               </div>
