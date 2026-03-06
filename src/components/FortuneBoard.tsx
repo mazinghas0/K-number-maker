@@ -34,12 +34,18 @@ export default function FortuneBoard({ lang, board, activeTheme, onBless }: Prop
               className={`relative overflow-hidden p-10 rounded-[3.5rem] border transition-all duration-500 hover:scale-[1.01] shadow-2xl ${
                 idx === 0 
                   ? 'bg-gradient-to-br from-yellow-500/10 to-transparent border-yellow-500/50 shadow-yellow-500/20' 
+                  : idx === 1
+                  ? 'bg-gradient-to-br from-gray-300/10 to-transparent border-gray-300/30'
+                  : idx === 2
+                  ? 'bg-gradient-to-br from-orange-400/10 to-transparent border-orange-400/30'
                   : `${activeTheme.card} border-white/5`
               }`}
             >
-              {idx === 0 && (
-                <div className="absolute top-0 right-0 bg-yellow-500 text-black text-[10px] font-black px-5 py-2 rounded-bl-3xl uppercase tracking-widest animate-pulse shadow-lg">
-                  🏆 1st Golden Aura
+              {idx < 3 && (
+                <div className={`absolute top-0 right-0 ${
+                  idx === 0 ? 'bg-yellow-500 text-black' : idx === 1 ? 'bg-gray-300 text-black' : 'bg-orange-400 text-black'
+                } text-[10px] font-black px-6 py-2 rounded-bl-3xl uppercase tracking-widest shadow-lg z-10`}>
+                  {idx === 0 ? '🏆 1st Aura' : idx === 1 ? '🥈 2nd Rank' : '🥉 3rd Place'}
                 </div>
               )}
               
