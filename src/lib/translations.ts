@@ -1,0 +1,72 @@
+import { Lang, Translation } from "./types";
+
+export const TRANSLATIONS: Record<Lang, Translation> = {
+  en: {
+    title: "K-number", subtitle: "Mystic Oracle", invoke: "Invoke", records: "Records", oracle: "Oracle", board: "Board",
+    login: "Login", logout: "Logout", generateLuck: "GENERATE LUCK", invoking: "INVOKING...",
+    selectMode: "Select Mode", numCount: "Numbers", range: "Range", connected: "Destiny Connected",
+    noRecords: "The scrolls are empty.", resetProfile: "Reset Destiny", awakenDestiny: "Awaken Destiny",
+    oracleGuide: "The Oracle requires your birth alignment", nameLabel: "Name",
+    dateLabel: "Birth Date", startOracle: "ACTIVATE ORACLE", luckyArea: "Lucky Area",
+    luckIndex: "Luck Index", shareTitle: "Destiny Card", close: "Close", elementAnalysis: "Element Balance",
+    postBoard: "Post to Square", boardTitle: "Fortune Square", writeMessage: "Leave a luck message...", send: "Send",
+    menu: "Menu", myRules: "My Rules", alarms: "Alarms & Routines", settings: "Settings",
+    onbTitle1: "Welcome to K-Fortune", onbDesc1: "Generate your lucky numbers blending Eastern Oracle with global lotteries.",
+    onbTitle2: "Smart Modes", onbDesc2: "Use Quick Random, Custom rules, or let the Oracle guide your destiny.",
+    onbTitle3: "Stay in Routine", onbDesc3: "Set alarms for Lotto days and never miss your chance at fortune.",
+    next: "Next", start: "Start Destiny",
+    chatWelcome: "I sense your aura.", chatAskMood: "How is your mood today?", chatActionGen: "Align Destiny & Generate", chatReset: "Restart Consultation",
+    themeLabel: "THEME", bestLuck: "LUCKY COMBINATIONS"
+  },
+  ko: {
+    title: "K-포춘", subtitle: "신비로운 운세 상담소", invoke: "번호 생성", records: "행운 기록", oracle: "운세 상담", board: "행운 광장",
+    login: "로그인", logout: "로그아웃", generateLuck: "행운 불러오기", invoking: "기운 모으는 중...",
+    selectMode: "운명의 모드 선택", numCount: "숫자 개수", range: "번호 범위", connected: "운명이 연결됨",
+    noRecords: "아직 기록이 없습니다.", resetProfile: "프로필 초기화", awakenDestiny: "운명을 깨우세요",
+    oracleGuide: "사주 정보를 입력해 주세요", nameLabel: "이름",
+    dateLabel: "생년월일", startOracle: "분석 시작", luckyArea: "행운의 영역",
+    luckIndex: "오늘의 행운", shareTitle: "운명의 카드", close: "닫기", elementAnalysis: "오행 기운 밸런스",
+    postBoard: "광장에 자랑하기", boardTitle: "행운 광장", writeMessage: "행운의 한마디...", send: "전송",
+    menu: "메뉴", myRules: "나만의 규칙", alarms: "알람 및 루틴", settings: "설정",
+    onbTitle1: "K-포춘에 오신 것을 환영합니다", onbDesc1: "동양의 운세와 글로벌 복권 시스템이 결합된 나만의 행운 번호를 만들어보세요.",
+    onbTitle2: "스마트 모드", onbDesc2: "빠른 생성, 커스텀 규칙, 혹은 운세 엔진(Oracle)의 가이드를 받아보세요.",
+    onbTitle3: "루틴 알람", onbDesc3: "로또 데이 알람을 설정하여 행운의 타이밍을 놓치지 마세요.",
+    next: "다음", start: "운명 시작하기",
+    chatWelcome: "당신의 맑은 기운이 느껴집니다.", chatAskMood: "오늘의 기분은 어떠신가요?", chatActionGen: "운명의 번호 생성하기", chatReset: "상담 다시 시작하기",
+    themeLabel: "테마 설정", bestLuck: "행운의 조합"
+  },
+  ja: {
+    title: "K-運勢", subtitle: "神秘的な占いの館", invoke: "番号生成", records: "幸運の記録", oracle: "運勢診断", board: "幸運広場",
+    login: "ログイン", logout: "ログアウト", generateLuck: "幸運を呼ぶ", invoking: "パワー集中中...",
+    selectMode: "モード選択", numCount: "数字の数", range: "範囲", connected: "運命が繋がった",
+    noRecords: "記録がありません。", resetProfile: "リセット", awakenDestiny: "運命를呼び覚ます",
+    oracleGuide: "生年月日を入力してください", nameLabel: "名前",
+    dateLabel: "生年月日", startOracle: "診断開始", luckyArea: "ラッキーエリア",
+    luckIndex: "今日の運勢", shareTitle: "運命のカード", close: "閉じる", elementAnalysis: "五行バランス",
+    postBoard: "広場でシェア", boardTitle: "幸運広場", writeMessage: "メッセージ...", send: "送信",
+    menu: "メニュー", myRules: "マイルール", alarms: "アラームとルーチン", settings: "設定",
+    onbTitle1: "K-運勢へようこそ", onbDesc1: "東洋の占いとグローバル宝くじを組み合わせたラッキーナンバーを生成します。",
+    onbTitle2: "スマートモード", onbDesc2: "クイック生成、カスタム、または占いのガイドに従ってください。",
+    onbTitle3: "ルーチンアラーム", onbDesc3: "宝くじの日のアラームを設定して、幸運のタイミングを逃さないようにしましょう。",
+    next: "次へ", start: "運命を始める",
+    chatWelcome: "あなたのオーラを感じます。", chatAskMood: "今日の気分はどうですか？", chatActionGen: "運命の番号を生成する", chatReset: "相談をやり直す",
+    themeLabel: "テーマ設定", bestLuck: "幸運の組み合わせ"
+  },
+  es: {
+    title: "K-Fortuna", subtitle: "Oráculo Místico", invoke: "Invocar", records: "Registros", oracle: "Oráculo", board: "Plaza",
+    login: "Entrar", logout: "Salir", generateLuck: "GENERAR SUERTE", invoking: "INVOCANDO...",
+    selectMode: "Modo de Destino", numCount: "Números", range: "Rango", connected: "Destino Conectado",
+    noRecords: "Los pergaminos están vacíos.", resetProfile: "Reiniciar", awakenDestiny: "Despierta tu Destino",
+    oracleGuide: "El Oráculo requiere tu alineación", nameLabel: "Nombre",
+    dateLabel: "Fecha de Nacimiento", startOracle: "ACTIVAR ORÁCULO", luckyArea: "Zona de Suerte",
+    luckIndex: "Índice de Suerte", shareTitle: "Carta de Destino", close: "Cerrar", elementAnalysis: "Balance de Elementos",
+    postBoard: "Publicar en Plaza", boardTitle: "Plaza de Fortuna", writeMessage: "Mensaje de suerte...", send: "Enviar",
+    menu: "Menú", myRules: "Mis Reglas", alarms: "Alarmas y Rutinas", settings: "Ajustes",
+    onbTitle1: "Bienvenido a K-Fortuna", onbDesc1: "Genera números de la suerte combinando el Oráculo Oriental y loterías globales.",
+    onbTitle2: "Modos Inteligentes", onbDesc2: "Usa modos rápidos, personalizados o deja que el Oráculo guíe tu destino.",
+    onbTitle3: "Mantén la Rutina", onbDesc3: "Configura alarmas para los días de lotería y no pierdas tu oportunidad.",
+    next: "Siguiente", start: "Iniciar Destino",
+    chatWelcome: "Siento tu aura.", chatAskMood: "¿Cómo está tu estado de ánimo hoy?", chatActionGen: "Generar Números de Destino", chatReset: "Reiniciar Consulta",
+    themeLabel: "Tema", bestLuck: "Combinaciones de Suerte"
+  }
+};
