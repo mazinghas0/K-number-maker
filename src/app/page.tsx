@@ -8,6 +8,7 @@ import { TRANSLATIONS } from "@/lib/translations";
 import { analyzeDestiny, getBallColor } from "@/lib/fortuneEngine";
 import OracleChat from "@/components/OracleChat";
 import FortuneBoard from "@/components/FortuneBoard";
+import AlarmSettings from "@/components/AlarmSettings";
 
 const LOTTERY_PRESETS: LotteryPreset[] = [
   { id: "k-lotto", name: "K-Lotto", count: 6, max: 45, country: "🇰🇷", defaultLang: "ko" },
@@ -34,6 +35,7 @@ export default function Home() {
   const [board, setBoard] = useState<BoardItem[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [selectedLotto, setSelectedLotto] = useState<LotteryPreset>(LOTTERY_PRESETS[0]);
+  const [customSettings, setCustomSettings] = useState({ count: 6, max: 45 });
   const [user, setUser] = useState<User | null>(null);
   const [boardMessage, setBoardMessage] = useState("");
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
@@ -56,7 +58,7 @@ export default function Home() {
   const handleTouchEnd = (e: React.TouchEvent) => {
     if (!touchX.current) return;
     const delta = touchX.current - e.changedTouches[0].clientX;
-    const tabs: TabType[] = ["generate", "history", "agent", "board"];
+    const tabs: TabType[] = ["generate", "history", "agent", "board", "alarms"];
     const idx = tabs.indexOf(activeTab as TabType);
     if (Math.abs(delta) > 50 && idx !== -1) {
       if (delta > 0 && idx < tabs.length - 1) setActiveTab(tabs[idx + 1]);
@@ -69,13 +71,19 @@ export default function Home() {
     const savedLang = localStorage.getItem("k-fortune-lang") as Lang;
     const savedTab = localStorage.getItem("k-fortune-tab") as TabType;
     const savedTheme = localStorage.getItem("k-fortune-theme") as ThemeType;
+    const savedAlarms = localStorage.getItem("k-fortune-alarms");
     const hasOnboarded = localStorage.getItem("k-fortune-onboarded");
     
     if (savedLang) setLang(savedLang);
-    if (savedTab && ["generate", "history", "agent", "board"].includes(savedTab)) setActiveTab(savedTab);
+    if (savedTab && ["generate", "history", "agent", "board", "alarms"].includes(savedTab)) setActiveTab(savedTab);
     if (savedTheme) setTheme(savedTheme);
+    if (savedAlarms) setAlarms(JSON.parse(savedAlarms));
     if (!hasOnboarded) setShowOnboarding(true);
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem("k-fortune-alarms", JSON.stringify(alarms));
+  }, [alarms]);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => setUser(user));
@@ -106,11 +114,16 @@ export default function Home() {
   const handleGenerate = async () => {
     triggerHaptic(); setIsGenerating(true); setVisibleCount(0); setNumbers([]);
     setTimeout(async () => {
-      const gs = new Set<number>(); const m = selectedLotto.max;
-      while (gs.size < selectedLotto.count) { gs.add(Math.floor(Math.random() * m) + 1); }
+      const gs = new Set<number>(); 
+      const m = selectedLotto.id === "custom" ? customSettings.max : selectedLotto.max;
+      const count = selectedLotto.id === "custom" ? customSettings.count : selectedLotto.count;
+      while (gs.size < count) { gs.add(Math.floor(Math.random() * m) + 1); }
       const sorted = Array.from(gs).sort((a, b) => a - b); setNumbers(sorted);
       for (let i = 1; i <= sorted.length; i++) { setTimeout(() => { setVisibleCount(i); triggerHaptic(); }, i * 150); }
-      if (user) await supabase.from("lotto_history").insert([{ numbers: sorted, mode: selectedLotto.name, user_id: user.id }]);
+      if (user) {
+        await supabase.from("lotto_history").insert([{ numbers: sorted, mode: selectedLotto.name, user_id: user.id }]);
+        fetchHistory();
+      }
       setIsGenerating(false);
     }, 800);
   };
@@ -124,7 +137,10 @@ export default function Home() {
       if (seed <= m) gs.add(seed);
       while (gs.size < selectedLotto.count) { gs.add(Math.floor(Math.random() * m) + 1); }
       const sorted = Array.from(gs).sort((a, b) => a - b); setNumbers(sorted);
-      if (user) await supabase.from("lotto_history").insert([{ numbers: sorted, mode: `Oracle (${luckyElement.name})`, user_id: user.id }]);
+      if (user) {
+        await supabase.from("lotto_history").insert([{ numbers: sorted, mode: `Oracle (${luckyElement.name})`, user_id: user.id }]);
+        fetchHistory();
+      }
       setIsGenerating(false);
     }, 1500);
   };
@@ -167,7 +183,7 @@ export default function Home() {
         </div>
         <div className="flex gap-2">
           {(["ko", "en", "ja", "es"] as Lang[]).map(l => (
-            <button key={l} onClick={() => setLang(l)} className={`px-2 py-1 rounded text-[10px] font-black uppercase ${lang === l ? activeTheme.primary + " text-white shadow-lg" : "bg-white/5 text-gray-500"}`}>{l}</button>
+            <button key={l} onClick={() => { setLang(l); localStorage.setItem("k-fortune-lang", l); }} className={`px-2 py-1 rounded text-[10px] font-black uppercase ${lang === l ? activeTheme.primary + " text-white shadow-lg" : "bg-white/5 text-gray-500"}`}>{l}</button>
           ))}
         </div>
       </header>
@@ -183,7 +199,7 @@ export default function Home() {
             </div>
             <div className="flex-1 space-y-4">
               {["generate", "history", "agent", "board", "alarms"].map(tab => (
-                <button key={tab} onClick={() => { setActiveTab(tab as TabType); setShowSidebar(false); }} className={`w-full flex items-center gap-5 px-8 py-5 rounded-[2.5rem] font-black text-xl transition-all ${activeTab === tab ? activeTheme.primary + " text-white shadow-2xl scale-105" : "hover:bg-white/5 opacity-60"}`}>
+                <button key={tab} onClick={() => { setActiveTab(tab as TabType); setShowSidebar(false); localStorage.setItem("k-fortune-tab", tab); }} className={`w-full flex items-center gap-5 px-8 py-5 rounded-[2.5rem] font-black text-xl transition-all ${activeTab === tab ? activeTheme.primary + " text-white shadow-2xl scale-105" : "hover:bg-white/5 opacity-60"}`}>
                   <span className="text-3xl">{tab === "generate" ? "🎲" : tab === "history" ? "📜" : tab === "agent" ? "☯️" : tab === "board" ? "🏛️" : "⏰"}</span>
                   <span>{tab === "generate" ? t.invoke : tab === "history" ? t.records : tab === "agent" ? t.oracle : tab === "board" ? t.board : t.alarms}</span>
                 </button>
@@ -191,9 +207,16 @@ export default function Home() {
             </div>
             <div className="pt-10 border-t border-white/10">
               <p className="text-xs font-black text-gray-500 uppercase tracking-widest mb-6">{t.themeLabel}</p>
-              <div className="flex gap-4">
+              <div className="flex justify-between items-center bg-black/20 p-4 rounded-3xl border border-white/5">
                 {(["dark", "gold", "paper", "aurora"] as ThemeType[]).map(th => (
-                  <button key={th} onClick={() => { setTheme(th); localStorage.setItem("k-fortune-theme", th); }} className={`w-12 h-12 rounded-full border-4 shadow-xl transition-transform hover:scale-110 ${theme === th ? 'border-white scale-110' : 'border-transparent opacity-50'}`} style={{ backgroundColor: THEMES[th].primary.includes('#') ? THEMES[th].primary : '#333' }}></button>
+                  <button 
+                    key={th} 
+                    onClick={() => { setTheme(th); localStorage.setItem("k-fortune-theme", th); }} 
+                    className={`w-12 h-12 rounded-full border-4 shadow-xl transition-all hover:scale-110 flex flex-col items-center relative ${theme === th ? 'border-white scale-110' : 'border-transparent opacity-40'}`} 
+                    style={{ backgroundColor: THEMES[th].primary }}
+                  >
+                    {theme === th && <span className="absolute -bottom-6 text-[8px] font-black uppercase text-white whitespace-nowrap">{th}</span>}
+                  </button>
                 ))}
               </div>
             </div>
@@ -205,13 +228,32 @@ export default function Home() {
         {activeTab === "generate" && (
           <div className="flex flex-col gap-10 animate-in fade-in duration-500">
             <div className="grid grid-cols-2 gap-5">
-              {LOTTERY_PRESETS.slice(0, 4).map(l => (
+              {LOTTERY_PRESETS.map(l => (
                 <button key={l.id} onClick={() => { setSelectedLotto(l); setLang(l.defaultLang); }} className={`p-8 rounded-[2.5rem] border-2 transition-all hover:scale-[1.03] shadow-lg flex flex-col items-center gap-3 ${selectedLotto.id === l.id ? activeTheme.primary + " border-transparent text-white shadow-blue-500/20" : "bg-white/5 border-white/10 text-gray-500"}`}>
                   <span className="text-5xl drop-shadow-md">{l.country}</span>
                   <p className="text-sm font-black uppercase tracking-widest">{l.name}</p>
                 </button>
               ))}
             </div>
+
+            {selectedLotto.id === "custom" && (
+              <div className={`${activeTheme.card} p-10 rounded-[3rem] border border-white/5 space-y-10 animate-in zoom-in duration-300`}>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center px-2">
+                    <span className="text-xs font-black text-blue-500 uppercase tracking-widest">{t.numCount}</span>
+                    <span className="text-3xl font-black italic">{customSettings.count}</span>
+                  </div>
+                  <input type="range" min="1" max="10" step="1" value={customSettings.count} onChange={(e) => setCustomSettings({ ...customSettings, count: parseInt(e.target.value) })} className="w-full h-3 bg-white/10 rounded-lg appearance-none cursor-pointer accent-blue-500" />
+                </div>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center px-2">
+                    <span className="text-xs font-black text-blue-500 uppercase tracking-widest">{t.range} (MAX)</span>
+                    <span className="text-3xl font-black italic">{customSettings.max}</span>
+                  </div>
+                  <input type="range" min="10" max="99" step="1" value={customSettings.max} onChange={(e) => setCustomSettings({ ...customSettings, max: parseInt(e.target.value) })} className="w-full h-3 bg-white/10 rounded-lg appearance-none cursor-pointer accent-blue-500" />
+                </div>
+              </div>
+            )}
             
             <section className={`${activeTheme.card} rounded-[4rem] p-14 min-h-[360px] flex flex-col items-center justify-center border border-white/5 shadow-[inset_0_0_50px_rgba(0,0,0,0.2)] relative overflow-hidden group`}>
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(37,99,235,0.05)_0%,transparent_70%)]"></div>
@@ -252,6 +294,10 @@ export default function Home() {
           <FortuneBoard lang={lang} board={board} activeTheme={activeTheme} onBless={handleBless} />
         )}
 
+        {activeTab === "alarms" && (
+          <AlarmSettings lang={lang} alarms={alarms} setAlarms={setAlarms} activeTheme={activeTheme} />
+        )}
+
         {activeTab === "history" && (
           <div className="flex flex-col gap-8 animate-in slide-in-from-bottom-8 duration-500">
             <h2 className="text-4xl font-black italic px-4">{t.records}</h2>
@@ -280,7 +326,7 @@ export default function Home() {
 
       <nav className={`fixed bottom-10 left-1/2 -translate-x-1/2 w-[92%] max-w-[480px] ${activeTheme.card}/95 backdrop-blur-3xl border border-white/10 flex justify-around items-center py-6 z-20 rounded-[3.5rem] shadow-[0_25px_60px_rgba(0,0,0,0.4)]`}>
         {["generate", "agent", "board", "history"].map(tab => (
-          <button key={tab} onClick={() => { setActiveTab(tab as TabType); triggerHaptic(); }} className={`flex flex-col items-center gap-2 transition-all ${activeTab === tab ? activeTheme.accent + " scale-125 -translate-y-2 drop-shadow-[0_0_15px_rgba(37,99,235,0.5)]" : "text-gray-500 hover:text-gray-300"}`}>
+          <button key={tab} onClick={() => { setActiveTab(tab as TabType); triggerHaptic(); localStorage.setItem("k-fortune-tab", tab); }} className={`flex flex-col items-center gap-2 transition-all ${activeTab === tab ? activeTheme.accent + " scale-125 -translate-y-2 drop-shadow-[0_0_15px_rgba(37,99,235,0.5)]" : "text-gray-500 hover:text-gray-300"}`}>
             <span className="text-3xl">{tab === "generate" ? "🎲" : tab === "agent" ? "☯️" : tab === "board" ? "🏛️" : "📜"}</span>
             <span className="text-[10px] font-black uppercase tracking-widest">{tab === "generate" ? t.invoke : tab === "agent" ? t.oracle : tab === "board" ? t.board : t.records}</span>
           </button>
