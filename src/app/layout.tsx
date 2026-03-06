@@ -13,15 +13,24 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "K-number maker",
-  description: "나만의 맞춤 번호 생성기 + 루틴 관리 AI 도구",
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "default",
-    title: "K-number",
-  },
-  formatDetection: {
-    telephone: false,
+  title: "K-number Fortune | Your Mystic Destiny Oracle",
+  description: "Experience the fusion of Eastern Five Elements philosophy and global destiny tools. Generate your lucky numbers with the guidance of the Mystic Oracle.",
+  keywords: ["Lotto", "Fortune", "Oracle", "Lucky Numbers", "Five Elements", "Saju", "K-Fortune"],
+  authors: [{ name: "K-number Team" }],
+  openGraph: {
+    title: "K-number Fortune | Your Mystic Destiny Oracle",
+    description: "Invoke your luck with Eastern mystical guidance. Global lottery presets and personalized fortune reports.",
+    url: "https://k-number-maker.pages.dev",
+    siteName: "K-number Fortune",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+      },
+    ],
+    locale: "en_US",
+    type: "website",
   },
 };
 
@@ -32,7 +41,7 @@ export const viewport: Viewport = {
   userScalable: false,
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#0a0a0a" },
+    { media: "(prefers-color-scheme: dark)", color: "#000000" },
   ],
 };
 
@@ -46,8 +55,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <div className="flex justify-center min-h-screen bg-gray-100 dark:bg-neutral-900">
-          {/* 모바일 뷰 제한 박스 (최대 480px, 그림자 효과) */}
+        <div className="flex justify-center min-h-screen bg-neutral-100 dark:bg-neutral-900">
           <div className="w-full max-w-[480px] bg-white dark:bg-black min-h-screen relative shadow-2xl overflow-hidden flex flex-col">
             {children}
           </div>
