@@ -6,6 +6,7 @@ import { User } from "@supabase/supabase-js";
 
 // --- Types ---
 type Lang = "en" | "ko" | "ja" | "es";
+type TabType = "generate" | "history" | "agent" | "board";
 
 interface Translation {
   title: string; subtitle: string; invoke: string; records: string; oracle: string; board: string;
@@ -39,14 +40,14 @@ const TRANSLATIONS: Record<Lang, Translation> = {
     postBoard: "광장에 자랑하기", boardTitle: "행운 광장", writeMessage: "행운의 한마디...", send: "전송",
   },
   ja: {
-    title: "K-運勢", subtitle: "神秘的な占いの館", invoke: "번호 생성", records: "幸運の記録", oracle: "運勢診断", board: "幸運広場",
-    login: "로그인", logout: "로그아웃", generateLuck: "幸運を呼ぶ", invoking: "パワー集中중...",
-    selectMode: "운명의 모드 선택", numCount: "숫자의 수", range: "범위", connected: "운명이 繋가났다",
-    noRecords: "기록이 없습니다.", resetProfile: "리셋", awakenDestiny: "운명을 깨우다",
-    oracleGuide: "생년월일을 입력해 주세요", nameLabel: "이름",
-    dateLabel: "생년월일", startOracle: "진단 시작", luckyArea: "라키 에리어",
-    luckIndex: "오늘의 운세", shareTitle: "운명의 카드", close: "닫기", elementAnalysis: "五行에너지 밸런스",
-    postBoard: "광장에서 쉐어", boardTitle: "행운 광장", writeMessage: "한마디 메시지...", send: "전송",
+    title: "K-運勢", subtitle: "神秘的な占いの館", invoke: "番号生成", records: "幸運の記録", oracle: "運勢診断", board: "幸運広場",
+    login: "ログイン", logout: "ログアウト", generateLuck: "幸運を呼ぶ", invoking: "パワー集中中...",
+    selectMode: "モード選択", numCount: "数字の数", range: "範囲", connected: "運命が繋がった",
+    noRecords: "記録がありません。", resetProfile: "リセット", awakenDestiny: "運命を呼び覚ます",
+    oracleGuide: "生年月日を入力してください", nameLabel: "名前",
+    dateLabel: "生年月日", startOracle: "診断開始", luckyArea: "ラッキーエリア",
+    luckIndex: "今日の運勢", shareTitle: "運命のカード", close: "閉じる", elementAnalysis: "五行バランス",
+    postBoard: "広場でシェア", boardTitle: "幸運広場", writeMessage: "メッセージ...", send: "送信",
   },
   es: {
     title: "K-Fortuna", subtitle: "Oráculo Místico", invoke: "Invocar", records: "Registros", oracle: "Oráculo", board: "Plaza",
@@ -70,7 +71,7 @@ interface BoardItem {
 }
 
 interface LotteryPreset {
-  id: string; name: string; count: number; max: number; country: string;
+  id: string; name: string; count: number; max: number; country: string; defaultLang: Lang;
 }
 
 interface UserProfile { name: string; birthDate: string; birthTime: string; }
@@ -82,11 +83,11 @@ interface ElementInfo {
 }
 
 const LOTTERY_PRESETS: LotteryPreset[] = [
-  { id: "k-lotto", name: "K-Lotto", count: 6, max: 45, country: "🇰🇷" },
-  { id: "powerball", name: "Powerball", count: 5, max: 69, country: "🇺🇸" },
-  { id: "euromillions", name: "EuroMillions", count: 5, max: 50, country: "🇪🇺" },
-  { id: "loto6", name: "Loto 6", count: 6, max: 43, country: "🇯🇵" },
-  { id: "custom", name: "Custom", count: 6, max: 45, country: "⚙️" },
+  { id: "k-lotto", name: "K-Lotto", count: 6, max: 45, country: "🇰🇷", defaultLang: "ko" },
+  { id: "powerball", name: "Powerball", count: 5, max: 69, country: "🇺🇸", defaultLang: "en" },
+  { id: "euromillions", name: "EuroMillions", count: 5, max: 50, country: "🇪🇺", defaultLang: "en" },
+  { id: "loto6", name: "Loto 6", count: 6, max: 43, country: "🇯🇵", defaultLang: "ja" },
+  { id: "custom", name: "Custom", count: 6, max: 45, country: "⚙️", defaultLang: "en" },
 ];
 
 const ELEMENTS: ElementInfo[] = [
@@ -101,7 +102,7 @@ const ELEMENTS: ElementInfo[] = [
     name: "Fire", symbol: "火", color: "text-red-500", bg: "bg-red-500/10", desc: "열정과 확산", range: [11, 20],
     messages: [
       { en: "Passion lights your way. Mid-range energy is high.", ko: "열정이 길을 밝힙니다. 중간 번호대의 에너지가 높습니다.", ja: "情熱が道を照らします。中間の番号に力が宿ります。", es: "La pasión ilumina tu camino. Energía media es alta." },
-      { en: "The sun peaks. Hot numbers are calling you.", ko: "태양이 정점입니다. 뜨거운 번호들이 당신을 부릅니다.", ja: "太陽が頂点です. 熱い数字があなたを呼んでいます.", es: "El sol está en su cenit. Los números calientes te llaman." }
+      { en: "The sun peaks. Hot numbers are calling you.", ko: "태양이 정점입니다. 뜨거운 번호들이 당신을 부릅니다.", ja: "太陽が頂点です. 熱い数字가 당신을 呼んでいます.", es: "El sol está en su cenit. Los números calientes te llaman." }
     ]
   },
   { 
@@ -127,17 +128,7 @@ const ELEMENTS: ElementInfo[] = [
   },
 ];
 
-type TabType = "generate" | "history" | "agent" | "board";
-
-const getBallColor = (num: number, max: number): string => {
-  const percent = (num / max) * 100;
-  if (percent <= 20) return "bg-gradient-to-br from-yellow-300 to-yellow-500 text-yellow-950";
-  if (percent <= 40) return "bg-gradient-to-br from-blue-300 to-blue-500 text-blue-950";
-  if (percent <= 60) return "bg-gradient-to-br from-red-300 to-red-500 text-red-950";
-  if (percent <= 80) return "bg-gradient-to-br from-gray-300 to-gray-500 text-gray-950";
-  return "bg-gradient-to-br from-green-300 to-green-500 text-green-950";
-};
-
+// --- Component ---
 export default function Home() {
   const [lang, setLang] = useState<Lang>("ko");
   const [activeTab, setActiveTab] = useState<TabType>("generate");
@@ -164,17 +155,33 @@ export default function Home() {
     if (typeof window !== "undefined" && window.navigator.vibrate) window.navigator.vibrate(10);
   }, []);
 
+  // --- Persistence Handlers ---
+  useEffect(() => {
+    const savedLang = localStorage.getItem("k-fortune-lang") as Lang;
+    const savedTab = localStorage.getItem("k-fortune-tab") as TabType;
+    if (savedLang) setLang(savedLang);
+    if (savedTab) setActiveTab(savedTab);
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("k-fortune-lang", lang);
+  }, [lang]);
+
+  useEffect(() => {
+    localStorage.setItem("k-fortune-tab", activeTab);
+  }, [activeTab]);
+
   const fetchHistory = useCallback(async () => {
     if (!user) return;
     const { data, error } = await supabase.from("lotto_history").select("*").order("created_at", { ascending: false }).limit(50);
     if (!error && data) {
       setHistory(data.map((item) => ({
         id: item.id as string, numbers: item.numbers as number[], mode: item.mode as string, created_at: item.created_at as string,
-        timestamp: new Date(item.created_at).toLocaleString("ko-KR", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }),
+        timestamp: new Date(item.created_at).toLocaleString(lang === "ko" ? "ko-KR" : "en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }),
         lottery_name: item.mode
       })));
     }
-  }, [user]);
+  }, [user, lang]);
 
   const fetchBoard = useCallback(async () => {
     const { data, error } = await supabase.from("fortune_board").select("*").order("created_at", { ascending: false }).limit(30);
@@ -233,12 +240,21 @@ export default function Home() {
       if (user) {
         const { data, error } = await supabase.from("lotto_history").insert([{ numbers: sortedNumbers, mode: selectedLotto.name, user_id: user.id }]).select();
         if (!error && data) {
-          const newItem: HistoryItem = { id: data[0].id, numbers: data[0].numbers, mode: data[0].mode, created_at: data[0].created_at, timestamp: "방금 생성", lottery_name: selectedLotto.name };
+          const newItem: HistoryItem = { id: data[0].id, numbers: data[0].numbers, mode: data[0].mode, created_at: data[0].created_at, timestamp: lang === "ko" ? "방금 생성" : "Just Now", lottery_name: selectedLotto.name };
           setHistory([newItem, ...history].slice(0, 50));
         }
       }
       setIsGenerating(false);
     }, 800);
+  };
+
+  const handleLottoSelect = (lotto: LotteryPreset) => {
+    triggerHaptic();
+    setSelectedLotto(lotto);
+    // 국가 카드 클릭 시 해당 국가의 기본 언어로 자동 전환
+    if (lotto.id !== "custom") {
+      setLang(lotto.defaultLang);
+    }
   };
 
   const handlePostToBoard = async () => {
@@ -298,7 +314,7 @@ export default function Home() {
           <div className="flex flex-col gap-8 animate-in fade-in duration-300">
             <section className="grid grid-cols-2 gap-3">
               {LOTTERY_PRESETS.map((lotto) => (
-                <button key={lotto.id} onClick={() => { setSelectedLotto(lotto); triggerHaptic(); }} className={`px-6 py-5 rounded-[2rem] border-2 transition-all flex flex-col items-center justify-center gap-2 ${selectedLotto.id === lotto.id ? "bg-blue-600 border-blue-600 text-white shadow-xl scale-[1.02]" : "bg-white dark:bg-neutral-900 border-gray-100 dark:border-neutral-800 text-gray-400 hover:border-blue-200"}`}>
+                <button key={lotto.id} onClick={() => handleLottoSelect(lotto)} className={`px-6 py-5 rounded-[2rem] border-2 transition-all flex flex-col items-center justify-center gap-2 ${selectedLotto.id === lotto.id ? "bg-blue-600 border-blue-600 text-white shadow-xl scale-[1.02]" : "bg-white dark:bg-neutral-900 border-gray-100 dark:border-neutral-800 text-gray-400 hover:border-blue-200"}`}>
                   <span className="text-3xl">{lotto.country}</span><span className="text-sm font-black uppercase tracking-tighter">{lotto.name}</span>
                 </button>
               ))}
@@ -308,11 +324,11 @@ export default function Home() {
               <section className="bg-gray-50 dark:bg-neutral-900/50 p-8 rounded-[2.5rem] space-y-8 border border-gray-100 dark:border-neutral-800">
                 <div className="space-y-4">
                   <div className="flex justify-between items-center font-black text-gray-400 uppercase tracking-widest text-xs"><span>{t.numCount}</span><span className="text-blue-600 text-base">{customCount}</span></div>
-                  <input type="range" min="3" max="10" value={customCount} onChange={(e) => setCustomCount(parseInt(e.target.value))} className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600" />
+                  <input type="range" min="3" max="10" value={customCount} onChange={(e) => setCustomCount(parseInt(e.target.value))} className="w-full h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600" />
                 </div>
                 <div className="space-y-4">
                   <div className="flex justify-between items-center font-black text-gray-400 uppercase tracking-widest text-xs"><span>{t.range}</span><span className="text-blue-600 text-base">1 ~ {customMax}</span></div>
-                  <input type="range" min="30" max="70" value={customMax} onChange={(e) => setCustomMax(parseInt(e.target.value))} className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600" />
+                  <input type="range" min="30" max="70" value={customMax} onChange={(e) => setCustomMax(parseInt(e.target.value))} className="w-full h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600" />
                 </div>
               </section>
             )}
