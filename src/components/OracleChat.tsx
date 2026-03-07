@@ -6,6 +6,17 @@ import { Lang, ChatMessage, UserProfile, ElementInfo, ThemeColors } from "@/lib/
 import { TRANSLATIONS } from "@/lib/translations";
 
 const FREE_LIMIT = 3;
+const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent`;
+
+const SYSTEM_PROMPT = `당신은 수십 년 경력의 명리학(命理學) 전문가이자 운세 상담사입니다.
+사주팔자(四柱八字), 오행(五行: 목화토금수), 천간(天干: 갑을병정무기경신임계), 지지(地支: 자축인묘진사오미신유술해), 용신(用神), 기신(忌神), 십성(十星), 대운(大運), 세운(歲運) 개념을 완전히 이해하고 있습니다.
+상담 시 규칙:
+- 신비롭고 따뜻하며 진지한 어조 유지
+- 구체적이고 실용적인 조언 제공
+- 답변은 3~5문장으로 간결하게
+- 사용자의 언어(ko/en/ja/es)에 맞게 응답
+- 번호 추천 요청 시 반드시 구체적인 숫자 포함
+- 과도한 부정적 예언 금지, 희망적 방향 제시`;
 
 const getTodayKey = () => `k-oracle-${new Date().toISOString().slice(0, 10)}`;
 const getUsage = () => {
@@ -70,10 +81,10 @@ export default function OracleChat({ lang, userProfile, luckyElement, activeThem
       const greeting = lang === "ko"
         ? `${userProfile.name}님, 반갑습니다. 당신은 ${luckyElement.ilgan}의 기운을 타고나셨군요. ${luckyElement.attribute}이(가) 오늘도 당신의 길을 비출 것입니다. 어떤 것이 궁금하신가요?`
         : lang === "ja"
-        ? `${userProfile.name}さん、ようこそ。あなたは${luckyElement.ilgan}の気を持って生まれました。${luckyElement.attribute}が今日もあなたの道を照らすでしょう。何が気になりますか？`
+        ? `${userProfile.name}さん、ようこそ。あなたは${luckyElement.ilgan}の気を持って生まれました。何が気になりますか？`
         : lang === "es"
-        ? `Bienvenido, ${userProfile.name}. Llevas la esencia de [${luckyElement.name}]. ${luckyElement.desc} guiará tu camino hoy. ¿Qué deseas saber?`
-        : `Welcome, ${userProfile.name}. You carry the essence of [${luckyElement.name}]. ${luckyElement.desc} will guide your path today. What would you like to know?`;
+        ? `Bienvenido, ${userProfile.name}. Llevas la esencia de [${luckyElement.name}]. ¿Qué deseas saber?`
+        : `Welcome, ${userProfile.name}. You carry the essence of [${luckyElement.name}]. What would you like to know?`;
 
       setMessages([{ id: "init", sender: "oracle", text: greeting }]);
     }
@@ -93,43 +104,53 @@ export default function OracleChat({ lang, userProfile, luckyElement, activeThem
 
     const userMsg: ChatMessage = { id: Date.now().toString(), sender: "user", text };
     const oracleId = (Date.now() + 1).toString();
-    const oracleMsg: ChatMessage = { id: oracleId, sender: "oracle", text: "" };
 
-    setMessages(prev => [...prev, userMsg, oracleMsg]);
+    setMessages(prev => [...prev, userMsg, { id: oracleId, sender: "oracle", text: "" }]);
     setInput("");
     setIsStreaming(true);
 
     try {
-      const historyForAPI = [...messages, userMsg];
+      const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+      const userContext = `\n\n사용자 정보:\n- 이름: ${userProfile.name}\n- 생년월일: ${userProfile.birthDate}\n- 타고난 일간: ${luckyElement.ilgan}\n- 오행 본질: ${luckyElement.attribute}\n- 행운 번호 범위: ${luckyElement.range[0]}~${luckyElement.range[1]}\n- 대화 언어: ${lang}`;
 
-      const res = await fetch("/api/oracle", {
+      const historyForAPI = [...messages, userMsg].filter(m => m.text);
+      const contents = historyForAPI.map(m => ({
+        role: m.sender === "user" ? "user" : "model",
+        parts: [{ text: m.text }],
+      }));
+
+      const body = {
+        system_instruction: { parts: [{ text: SYSTEM_PROMPT + userContext }] },
+        contents,
+        generationConfig: { temperature: 0.9, maxOutputTokens: 400 },
+      };
+
+      const res = await fetch(`${GEMINI_URL}?key=${apiKey}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: historyForAPI, userProfile, luckyElement, lang }),
+        body: JSON.stringify(body),
       });
 
-      if (!res.ok || !res.body) throw new Error("API error");
+      if (!res.ok) throw new Error(`${res.status}`);
 
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
-      let fullText = "";
+      const data = await res.json();
+      const fullText: string = data.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
 
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        fullText += decoder.decode(value, { stream: true });
-        setMessages(prev => prev.map(m => m.id === oracleId ? { ...m, text: fullText } : m));
+      // 타이핑 효과
+      for (let i = 3; i <= fullText.length; i += 3) {
+        setMessages(prev => prev.map(m => m.id === oracleId ? { ...m, text: fullText.slice(0, i) } : m));
+        await new Promise(r => setTimeout(r, 12));
       }
+      setMessages(prev => prev.map(m => m.id === oracleId ? { ...m, text: fullText } : m));
 
       incUsage();
       setUsageToday(getUsage());
-    } catch {
-      setMessages(prev =>
-        prev.map(m => m.id === oracleId
-          ? { ...m, text: lang === "ko" ? "죄송합니다. 연결에 문제가 생겼습니다. 잠시 후 다시 시도해주세요." : "Sorry, a connection error occurred. Please try again." }
-          : m
-        )
-      );
+    } catch (e) {
+      const errText = lang === "ko"
+        ? "죄송합니다. 연결에 문제가 생겼습니다. 잠시 후 다시 시도해주세요."
+        : "Sorry, a connection error occurred. Please try again.";
+      setMessages(prev => prev.map(m => m.id === oracleId ? { ...m, text: errText } : m));
+      console.error("Gemini error:", e);
     } finally {
       setIsStreaming(false);
     }
@@ -147,9 +168,7 @@ export default function OracleChat({ lang, userProfile, luckyElement, activeThem
           <span className="text-xs font-black opacity-70">{luckyElement.ilgan}</span>
         </div>
         <div className={`text-xs font-black px-4 py-2 rounded-full border transition-colors ${
-          remaining <= 1
-            ? "text-red-400 bg-red-500/10 border-red-500/20"
-            : "opacity-50 border-white/10"
+          remaining <= 1 ? "text-red-400 bg-red-500/10 border-red-500/20" : "opacity-50 border-white/10"
         }`}>
           {lang === "ko" ? `오늘 ${remaining}회 남음` : `${remaining} left today`}
         </div>
@@ -220,7 +239,6 @@ export default function OracleChat({ lang, userProfile, luckyElement, activeThem
         </button>
       </div>
 
-      {/* 대화 초기화 */}
       {messages.length > 1 && (
         <button
           onClick={() => { setMessages([]); setInput(""); }}
@@ -246,7 +264,6 @@ export default function OracleChat({ lang, userProfile, luckyElement, activeThem
                   : `You've used all ${FREE_LIMIT} free consultations today.`}
               </p>
             </div>
-
             <div className="space-y-3">
               <button
                 onClick={() => alert(lang === "ko" ? "광고 기능을 준비 중입니다." : "Ad feature coming soon.")}
@@ -254,16 +271,14 @@ export default function OracleChat({ lang, userProfile, luckyElement, activeThem
               >
                 📺 {lang === "ko" ? "광고 시청 → +1회" : "Watch Ad → +1 more"}
               </button>
-
-              {!user ? (
+              {!user && (
                 <button
                   onClick={() => { setShowLimitModal(false); onLogin(); }}
                   className={`w-full py-4 rounded-2xl ${activeTheme.primary} text-white font-black text-sm hover:opacity-90 transition-all`}
                 >
                   🔑 {lang === "ko" ? "로그인하고 더 받기" : "Login for more"}
                 </button>
-              ) : null}
-
+              )}
               <button
                 onClick={() => alert(lang === "ko" ? "구독 기능을 준비 중입니다." : "Subscription coming soon.")}
                 className="w-full py-4 rounded-2xl bg-white/5 border border-white/10 font-black text-sm hover:bg-white/10 transition-all"
@@ -271,11 +286,7 @@ export default function OracleChat({ lang, userProfile, luckyElement, activeThem
                 ⭐ {lang === "ko" ? "구독 → 무제한" : "Subscribe → Unlimited"}
               </button>
             </div>
-
-            <button
-              onClick={() => setShowLimitModal(false)}
-              className="w-full text-center text-xs opacity-40 hover:opacity-70 transition-opacity"
-            >
+            <button onClick={() => setShowLimitModal(false)} className="w-full text-center text-xs opacity-40 hover:opacity-70 transition-opacity">
               {t.close}
             </button>
           </div>
