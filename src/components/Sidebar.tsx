@@ -1,86 +1,131 @@
 "use client";
 
 import React from "react";
-import { Lang, TabType, ThemeType, ThemeColors, Translation } from "@/lib/types";
+import { TabType, ThemeType, ThemeColors, Translation } from "@/lib/types";
 import { THEMES, THEME_PREVIEWS } from "@/lib/constants";
 
-interface Props {
-  show: boolean;
-  onClose: () => void;
+type DisplayedTab = "generate" | "history" | "agent" | "board" | "alarms";
+
+interface SidebarProps {
+  show?: boolean;
+  onClose?: () => void;
   activeTab: TabType;
   onTabChange: (tab: TabType) => void;
   theme: ThemeType;
   onThemeChange: (theme: ThemeType) => void;
   activeTheme: ThemeColors;
   t: Translation;
+  mode?: "overlay" | "permanent";
 }
 
-const TAB_ICONS: Record<string, string> = {
-  generate: "🎲", history: "📜", agent: "☯️", board: "🏛️", alarms: "⏰",
+const DISPLAYED_TABS: DisplayedTab[] = ["generate", "history", "agent", "board", "alarms"];
+
+const TAB_ICONS: Record<DisplayedTab, string> = {
+  generate: "🎲",
+  history: "📜",
+  agent: "🔮",
+  board: "🏛️",
+  alarms: "⏰",
 };
 
-export default function Sidebar({ show, onClose, activeTab, onTabChange, theme, onThemeChange, activeTheme, t }: Props) {
-  if (!show) return null;
+const THEME_LIST: ThemeType[] = ["dark", "gold", "paper", "aurora"];
 
-  const handleTab = (tab: TabType) => {
+export default function Sidebar({
+  show,
+  onClose,
+  activeTab,
+  onTabChange,
+  theme,
+  onThemeChange,
+  activeTheme,
+  t,
+  mode = "overlay",
+}: SidebarProps) {
+  if (mode === "overlay" && !show) return null;
+
+  const TAB_LABELS: Record<DisplayedTab, string> = {
+    generate: t.invoke,
+    history: t.records,
+    agent: t.oracle,
+    board: t.board,
+    alarms: t.alarms,
+  };
+
+  const handleTab = (tab: DisplayedTab) => {
     onTabChange(tab);
     localStorage.setItem("k-fortune-tab", tab);
-    onClose();
+    if (mode === "overlay") onClose?.();
   };
 
-  const tabLabel = (tab: string) => {
-    const map: Record<string, string> = {
-      generate: t.invoke, history: t.records, agent: t.oracle, board: t.board, alarms: t.alarms,
-    };
-    return map[tab] || tab;
-  };
+  const navItems = (
+    <div className="flex-1 space-y-2 px-4 overflow-y-auto py-2">
+      {DISPLAYED_TABS.map(tab => (
+        <button
+          key={tab}
+          onClick={() => handleTab(tab)}
+          className={`w-full flex items-center gap-4 px-6 py-4 rounded-[2rem] font-black text-lg transition-all ${
+            activeTab === tab
+              ? `${activeTheme.primary} text-white shadow-2xl scale-[1.03]`
+              : "hover:bg-white/5 opacity-60 hover:opacity-100"
+          }`}
+        >
+          <span className="text-2xl">{TAB_ICONS[tab]}</span>
+          <span>{TAB_LABELS[tab]}</span>
+        </button>
+      ))}
+    </div>
+  );
 
+  const themeSelector = (
+    <div className="pt-6 border-t border-white/10 px-4 pb-6">
+      <p className="text-xs font-black opacity-50 uppercase tracking-widest mb-4 px-2">{t.themeLabel}</p>
+      <div className="grid grid-cols-4 gap-3 bg-white/5 p-4 rounded-[2rem] border border-white/10">
+        {THEME_LIST.map(th => (
+          <button
+            key={th}
+            onClick={() => { onThemeChange(th); localStorage.setItem("k-fortune-theme", th); }}
+            className="flex flex-col items-center gap-2 transition-all group"
+          >
+            <div
+              className={`w-12 h-12 rounded-full border-4 shadow-xl transition-all flex items-center justify-center ${
+                theme === th ? "border-blue-500 scale-110" : "border-transparent opacity-60 group-hover:opacity-100"
+              }`}
+              style={{ backgroundColor: THEMES[th].bg.match(/#[a-f0-9]+/i)?.[0] ?? "#222" }}
+            >
+              <div className="w-5 h-5 rounded-full shadow-md" style={{ backgroundColor: THEME_PREVIEWS[th] }} />
+            </div>
+            <span className={`text-[9px] font-black uppercase tracking-tighter ${theme === th ? "opacity-100" : "opacity-40"}`}>{th}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+
+  // --- Permanent (desktop) mode ---
+  if (mode === "permanent") {
+    return (
+      <div className="flex flex-col h-full">
+        <div className="px-8 pt-10 pb-6 flex-shrink-0">
+          <h1 className="text-3xl font-black italic tracking-tighter">{t.title}</h1>
+          <p className={`text-xs font-bold uppercase tracking-[0.3em] mt-1 ${activeTheme.accent}`}>{t.subtitle}</p>
+        </div>
+        {navItems}
+        {themeSelector}
+      </div>
+    );
+  }
+
+  // --- Overlay (mobile) mode ---
   return (
     <div className="fixed inset-0 z-50 flex">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-md" onClick={onClose} />
-      <div className={`relative w-80 ${activeTheme.card} h-full shadow-2xl p-10 flex flex-col`}>
-        <div className="flex justify-between items-center mb-12">
+      <div className={`relative w-80 ${activeTheme.card} h-full shadow-2xl flex flex-col overflow-hidden`}>
+        <div className="flex justify-between items-center px-8 pt-10 pb-6 flex-shrink-0">
           <span className="text-3xl font-black italic">{t.menu}</span>
-          <button onClick={onClose} className="text-3xl hover:text-red-500">✕</button>
+          <button onClick={onClose} className="text-3xl hover:text-red-500 transition-colors">✕</button>
         </div>
-
-        <div className="flex-1 space-y-4">
-          {["generate", "history", "agent", "board", "alarms"].map(tab => (
-            <button
-              key={tab}
-              onClick={() => handleTab(tab as TabType)}
-              className={`w-full flex items-center gap-5 px-8 py-5 rounded-[2.5rem] font-black text-xl transition-all ${
-                activeTab === tab ? activeTheme.primary + " text-white shadow-2xl scale-105" : "hover:bg-white/5 opacity-60"
-              }`}
-            >
-              <span className="text-3xl">{TAB_ICONS[tab]}</span>
-              <span>{tabLabel(tab)}</span>
-            </button>
-          ))}
-        </div>
-
-        <div className="pt-10 border-t border-white/10">
-          <p className="text-xs font-black opacity-50 uppercase tracking-widest mb-6">{t.themeLabel}</p>
-          <div className="grid grid-cols-4 gap-4 bg-black/5 dark:bg-white/5 p-6 rounded-[2.5rem] border border-black/5 dark:border-white/5 shadow-inner">
-            {(["dark", "gold", "paper", "aurora"] as ThemeType[]).map(th => (
-              <button
-                key={th}
-                onClick={() => { onThemeChange(th); localStorage.setItem("k-fortune-theme", th); }}
-                className="flex flex-col items-center gap-3 transition-all group"
-              >
-                <div
-                  className={`w-14 h-14 rounded-full border-4 shadow-xl transition-all relative overflow-hidden flex items-center justify-center ${
-                    theme === th ? "border-blue-500 scale-110" : "border-transparent opacity-60 group-hover:opacity-100"
-                  }`}
-                  style={{ backgroundColor: THEMES[th].bg.includes("#") ? THEMES[th].bg.match(/#[a-f0-9]+/i)?.[0] : "#222" }}
-                >
-                  <div className="w-6 h-6 rounded-full shadow-md" style={{ backgroundColor: THEME_PREVIEWS[th] }} />
-                </div>
-                <span className={`text-[9px] font-black uppercase tracking-tighter ${theme === th ? "opacity-100" : "opacity-40"}`}>{th}</span>
-              </button>
-            ))}
-          </div>
-        </div>
+        {navItems}
+        {themeSelector}
       </div>
     </div>
   );

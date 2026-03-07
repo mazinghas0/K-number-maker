@@ -14,6 +14,10 @@ import AgentTab from "@/components/AgentTab";
 import FortuneBoard from "@/components/FortuneBoard";
 import AlarmSettings from "@/components/AlarmSettings";
 
+const DESKTOP_TAB_ICONS: Partial<Record<TabType, string>> = {
+  generate: "🎲", history: "📜", agent: "🔮", board: "🏛️", alarms: "⏰",
+};
+
 export default function Home() {
   const [lang, setLang] = useState<Lang>("ko");
   const [activeTab, setActiveTab] = useState<TabType>("generate");
@@ -106,7 +110,6 @@ export default function Home() {
       }
       setIsGenerating(false);
 
-      // 공 하나씩 랜덤 순서로 등장
       shuffled.forEach((_, i) => {
         setTimeout(() => {
           setRevealCount(c => c + 1);
@@ -114,7 +117,6 @@ export default function Home() {
         }, (i + 1) * 180);
       });
 
-      // 전부 등장 후 정렬 페이즈 전환
       setTimeout(() => {
         setAnimPhase("sort");
       }, (count + 3) * 180);
@@ -151,96 +153,151 @@ export default function Home() {
     setUserProfile(p);
   };
 
-  return (
-    <div className={`flex flex-col min-h-screen transition-all duration-700 ${activeTheme.bg} ${activeTheme.text}`}>
-      <header className={`px-8 py-8 flex justify-between items-center sticky top-0 ${activeTheme.bg}/90 backdrop-blur-xl z-30`}>
-        <button onClick={() => setShowSidebar(true)} className="p-3 bg-white/10 rounded-full hover:scale-110 transition-transform">
-          <span className="text-2xl">☰</span>
-        </button>
-        <div className="flex flex-col items-center">
-          <h1 className="text-4xl font-black italic tracking-tighter">{t.title}</h1>
-          <p className={`text-xs font-bold uppercase tracking-[0.3em] ${activeTheme.accent}`}>{t.subtitle}</p>
-        </div>
-        <div className="flex gap-2">
-          {(["ko", "en", "ja", "es"] as Lang[]).map(l => (
-            <button
-              key={l}
-              onClick={() => { setLang(l); localStorage.setItem("k-fortune-lang", l); }}
-              className={`px-2 py-1 rounded text-[10px] font-black uppercase ${lang === l ? activeTheme.primary + " text-white shadow-lg" : "bg-white/5 text-gray-500"}`}
-            >
-              {l}
-            </button>
-          ))}
-        </div>
-      </header>
+  const handleTabChange = (tab: TabType) => {
+    setActiveTab(tab);
+    localStorage.setItem("k-fortune-tab", tab);
+  };
 
+  const tabContent = (
+    <>
+      {activeTab === "generate" && (
+        <GenerateTab
+          selectedLotto={selectedLotto}
+          onLottoChange={(l) => { setSelectedLotto(l); setLang(l.defaultLang); }}
+          customSettings={customSettings}
+          onCustomChange={setCustomSettings}
+          numbers={numbers}
+          shuffledNums={shuffledNums}
+          revealCount={revealCount}
+          animPhase={animPhase}
+          isGenerating={isGenerating}
+          activeTheme={activeTheme}
+          t={t}
+          onGenerate={handleGenerate}
+        />
+      )}
+      {activeTab === "agent" && (
+        <AgentTab
+          lang={lang}
+          userProfile={userProfile}
+          tempProfile={tempProfile}
+          onTempProfileChange={setTempProfile}
+          onProfileSubmit={handleProfileSubmit}
+          luckyElement={luckyElement}
+          activeTheme={activeTheme}
+          isGenerating={isGenerating}
+          onGenerate={handleOracleGenerate}
+          t={t}
+        />
+      )}
+      {activeTab === "board" && (
+        <FortuneBoard lang={lang} board={board} activeTheme={activeTheme} onBless={handleBless} />
+      )}
+      {activeTab === "history" && (
+        <HistoryTab history={history} activeTheme={activeTheme} t={t} />
+      )}
+      {activeTab === "alarms" && (
+        <AlarmSettings lang={lang} alarms={alarms} setAlarms={setAlarms} activeTheme={activeTheme} />
+      )}
+    </>
+  );
+
+  return (
+    <div className={`transition-all duration-700 ${activeTheme.bg} ${activeTheme.text}`}>
+      {/* ── Desktop: permanent sidebar (lg+) ───────────────────────── */}
+      <aside className={`hidden lg:flex lg:flex-col lg:fixed lg:left-0 lg:top-0 lg:h-screen lg:w-72 ${activeTheme.card} border-r border-white/10 z-40`}>
+        <Sidebar
+          mode="permanent"
+          activeTab={activeTab}
+          onTabChange={handleTabChange}
+          theme={theme}
+          onThemeChange={setTheme}
+          activeTheme={activeTheme}
+          t={t}
+        />
+      </aside>
+
+      {/* ── Mobile: overlay sidebar ─────────────────────────────────── */}
       <Sidebar
+        mode="overlay"
         show={showSidebar}
         onClose={() => setShowSidebar(false)}
         activeTab={activeTab}
-        onTabChange={setActiveTab}
+        onTabChange={handleTabChange}
         theme={theme}
         onThemeChange={setTheme}
         activeTheme={activeTheme}
         t={t}
       />
 
-      <main className="flex-1 overflow-y-auto px-8 py-10 pb-48">
-        {activeTab === "generate" && (
-          <GenerateTab
-            selectedLotto={selectedLotto}
-            onLottoChange={(l) => { setSelectedLotto(l); setLang(l.defaultLang); }}
-            customSettings={customSettings}
-            onCustomChange={setCustomSettings}
-            numbers={numbers}
-            shuffledNums={shuffledNums}
-            revealCount={revealCount}
-            animPhase={animPhase}
-            isGenerating={isGenerating}
-            activeTheme={activeTheme}
-            t={t}
-            onGenerate={handleGenerate}
-          />
-        )}
-        {activeTab === "agent" && (
-          <AgentTab
-            lang={lang}
-            userProfile={userProfile}
-            tempProfile={tempProfile}
-            onTempProfileChange={setTempProfile}
-            onProfileSubmit={handleProfileSubmit}
-            luckyElement={luckyElement}
-            activeTheme={activeTheme}
-            isGenerating={isGenerating}
-            onGenerate={handleOracleGenerate}
-            t={t}
-          />
-        )}
-        {activeTab === "board" && (
-          <FortuneBoard lang={lang} board={board} activeTheme={activeTheme} onBless={handleBless} />
-        )}
-        {activeTab === "history" && (
-          <HistoryTab history={history} activeTheme={activeTheme} t={t} />
-        )}
-        {activeTab === "alarms" && (
-          <AlarmSettings lang={lang} alarms={alarms} setAlarms={setAlarms} activeTheme={activeTheme} />
-        )}
-      </main>
+      {/* ── Main content (shifts right on desktop) ──────────────────── */}
+      <div className="lg:ml-72 flex flex-col min-h-screen">
 
-      <nav className={`fixed bottom-10 left-1/2 -translate-x-1/2 w-[92%] max-w-[480px] ${activeTheme.card}/95 backdrop-blur-3xl border border-white/10 flex justify-around items-center py-6 z-20 rounded-[3.5rem] shadow-[0_25px_60px_rgba(0,0,0,0.4)]`}>
-        {["generate", "agent", "board", "history"].map(tab => (
+        {/* Header */}
+        <header className={`px-6 lg:px-10 py-5 lg:py-6 flex justify-between items-center sticky top-0 ${activeTheme.bg}/90 backdrop-blur-xl z-30`}>
+          {/* Mobile: hamburger */}
           <button
-            key={tab}
-            onClick={() => { setActiveTab(tab as TabType); triggerHaptic(); localStorage.setItem("k-fortune-tab", tab); }}
-            className={`flex flex-col items-center gap-2 transition-all ${activeTab === tab ? activeTheme.accent + " scale-125 -translate-y-2 drop-shadow-[0_0_15px_rgba(37,99,235,0.5)]" : "text-gray-500 hover:text-gray-300"}`}
+            onClick={() => setShowSidebar(true)}
+            className={`lg:hidden p-3 bg-white/10 rounded-full hover:scale-110 transition-transform`}
           >
-            <span className="text-3xl">{tab === "generate" ? "🎲" : tab === "agent" ? "☯️" : tab === "board" ? "🏛️" : "📜"}</span>
-            <span className="text-[10px] font-black uppercase tracking-widest">
-              {tab === "generate" ? t.invoke : tab === "agent" ? t.oracle : tab === "board" ? t.board : t.records}
-            </span>
+            <span className="text-2xl">☰</span>
           </button>
-        ))}
-      </nav>
+
+          {/* Mobile: centered title */}
+          <div className="lg:hidden flex flex-col items-center">
+            <h1 className="text-4xl font-black italic tracking-tighter">{t.title}</h1>
+            <p className={`text-xs font-bold uppercase tracking-[0.3em] ${activeTheme.accent}`}>{t.subtitle}</p>
+          </div>
+
+          {/* Desktop: current page indicator */}
+          <div className="hidden lg:flex items-center gap-3">
+            <span className="text-3xl">{DESKTOP_TAB_ICONS[activeTab] ?? "✨"}</span>
+            <span className="text-2xl font-black uppercase tracking-widest">
+              {activeTab === "generate" ? t.invoke
+                : activeTab === "history" ? t.records
+                : activeTab === "agent" ? t.oracle
+                : activeTab === "board" ? t.board
+                : t.alarms}
+            </span>
+          </div>
+
+          {/* Lang selector (always) */}
+          <div className="flex gap-2">
+            {(["ko", "en", "ja", "es"] as Lang[]).map(l => (
+              <button
+                key={l}
+                onClick={() => { setLang(l); localStorage.setItem("k-fortune-lang", l); }}
+                className={`px-2 py-1 rounded text-[10px] font-black uppercase ${lang === l ? activeTheme.primary + " text-white shadow-lg" : "bg-white/5 text-gray-500"}`}
+              >
+                {l}
+              </button>
+            ))}
+          </div>
+        </header>
+
+        {/* Main content */}
+        <main className="flex-1 px-6 lg:px-12 py-8 pb-40 lg:pb-12">
+          {tabContent}
+        </main>
+
+        {/* Mobile bottom nav (hidden on desktop) */}
+        <nav className={`lg:hidden fixed bottom-10 left-1/2 -translate-x-1/2 w-[92%] max-w-[480px] ${activeTheme.card}/95 backdrop-blur-3xl border border-white/10 flex justify-around items-center py-6 z-20 rounded-[3.5rem] shadow-[0_25px_60px_rgba(0,0,0,0.4)]`}>
+          {(["generate", "agent", "board", "history"] as TabType[]).map(tab => (
+            <button
+              key={tab}
+              onClick={() => { handleTabChange(tab); triggerHaptic(); }}
+              className={`flex flex-col items-center gap-2 transition-all ${activeTab === tab ? activeTheme.accent + " scale-125 -translate-y-2 drop-shadow-[0_0_15px_rgba(37,99,235,0.5)]" : "text-gray-500 hover:text-gray-300"}`}
+            >
+              <span className="text-3xl">
+                {tab === "generate" ? "🎲" : tab === "agent" ? "🔮" : tab === "board" ? "🏛️" : "📜"}
+              </span>
+              <span className="text-[10px] font-black uppercase tracking-widest">
+                {tab === "generate" ? t.invoke : tab === "agent" ? t.oracle : tab === "board" ? t.board : t.records}
+              </span>
+            </button>
+          ))}
+        </nav>
+      </div>
 
       <style jsx global>{`
         @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-15px); } 100% { transform: translateY(0px); } }
