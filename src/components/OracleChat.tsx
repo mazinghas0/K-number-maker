@@ -6,7 +6,7 @@ import { Lang, ChatMessage, UserProfile, ElementInfo, ThemeColors } from "@/lib/
 import { TRANSLATIONS } from "@/lib/translations";
 
 const FREE_LIMIT = 3;
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent`;
+const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent`;
 
 const SYSTEM_PROMPT = `당신은 수십 년 경력의 명리학(命理學) 전문가이자 운세 상담사입니다.
 사주팔자(四柱八字), 오행(五行: 목화토금수), 천간(天干: 갑을병정무기경신임계), 지지(地支: 자축인묘진사오미신유술해), 용신(用神), 기신(忌神), 십성(十星), 대운(大運), 세운(歲運) 개념을 완전히 이해하고 있습니다.
