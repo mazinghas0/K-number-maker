@@ -158,6 +158,19 @@ export default function Home() {
     localStorage.setItem("k-fortune-tab", tab);
   };
 
+  const handleLogin = () => {
+    supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: typeof window !== "undefined" ? window.location.origin : "" },
+    });
+    triggerHaptic();
+  };
+
+  const handleLogout = () => {
+    supabase.auth.signOut();
+    triggerHaptic();
+  };
+
   const tabContent = (
     <>
       {activeTab === "generate" && (
@@ -194,7 +207,7 @@ export default function Home() {
         <FortuneBoard lang={lang} board={board} activeTheme={activeTheme} onBless={handleBless} />
       )}
       {activeTab === "history" && (
-        <HistoryTab history={history} activeTheme={activeTheme} t={t} />
+        <HistoryTab history={history} activeTheme={activeTheme} t={t} user={user} onLogin={handleLogin} />
       )}
       {activeTab === "alarms" && (
         <AlarmSettings lang={lang} alarms={alarms} setAlarms={setAlarms} activeTheme={activeTheme} />
@@ -214,6 +227,9 @@ export default function Home() {
           onThemeChange={setTheme}
           activeTheme={activeTheme}
           t={t}
+          user={user}
+          onLogin={handleLogin}
+          onLogout={handleLogout}
         />
       </aside>
 
@@ -228,6 +244,9 @@ export default function Home() {
         onThemeChange={setTheme}
         activeTheme={activeTheme}
         t={t}
+        user={user}
+        onLogin={handleLogin}
+        onLogout={handleLogout}
       />
 
       {/* ── Main content (shifts right on desktop) ──────────────────── */}

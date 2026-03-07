@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { User } from "@supabase/supabase-js";
 import { TabType, ThemeType, ThemeColors, Translation } from "@/lib/types";
 import { THEMES, THEME_PREVIEWS } from "@/lib/constants";
 
@@ -16,6 +17,9 @@ interface SidebarProps {
   activeTheme: ThemeColors;
   t: Translation;
   mode?: "overlay" | "permanent";
+  user: User | null;
+  onLogin: () => void;
+  onLogout: () => void;
 }
 
 const DISPLAYED_TABS: DisplayedTab[] = ["generate", "history", "agent", "board", "alarms"];
@@ -40,6 +44,9 @@ export default function Sidebar({
   activeTheme,
   t,
   mode = "overlay",
+  user,
+  onLogin,
+  onLogout,
 }: SidebarProps) {
   if (mode === "overlay" && !show) return null;
 
@@ -101,6 +108,35 @@ export default function Sidebar({
     </div>
   );
 
+  const authSection = (
+    <div className="px-4 pb-6 pt-4 border-t border-white/10">
+      {user ? (
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex flex-col min-w-0">
+            <span className={`text-xs font-black uppercase truncate ${activeTheme.accent}`}>
+              {user.user_metadata?.name ?? user.email?.split("@")[0] ?? "Seeker"}
+            </span>
+            <span className="text-[10px] text-gray-500 tracking-tight">{t.connected}</span>
+          </div>
+          <button
+            onClick={onLogout}
+            className="flex-shrink-0 w-9 h-9 rounded-2xl bg-white/10 flex items-center justify-center text-base hover:bg-red-500/20 hover:scale-105 transition-all"
+            title={t.logout}
+          >
+            🚪
+          </button>
+        </div>
+      ) : (
+        <button
+          onClick={onLogin}
+          className={`w-full py-3 ${activeTheme.primary} text-white text-xs font-black rounded-2xl uppercase tracking-widest hover:opacity-90 hover:scale-[1.02] transition-all shadow-lg`}
+        >
+          {t.login}
+        </button>
+      )}
+    </div>
+  );
+
   // --- Permanent (desktop) mode ---
   if (mode === "permanent") {
     return (
@@ -111,6 +147,7 @@ export default function Sidebar({
         </div>
         {navItems}
         {themeSelector}
+        {authSection}
       </div>
     );
   }
@@ -126,6 +163,7 @@ export default function Sidebar({
         </div>
         {navItems}
         {themeSelector}
+        {authSection}
       </div>
     </div>
   );
