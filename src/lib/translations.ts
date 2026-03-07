@@ -16,7 +16,11 @@ export const TRANSLATIONS: Record<Lang, Translation> = {
     onbTitle3: "Stay in Routine", onbDesc3: "Set alarms for Lotto days and never miss your chance at fortune.",
     next: "Next", start: "Start Destiny",
     chatWelcome: "I sense your aura.", chatAskMood: "How is your mood today?", chatActionGen: "Align Destiny & Generate", chatReset: "Restart Consultation",
-    themeLabel: "THEME", bestLuck: "LUCKY COMBINATIONS"
+    themeLabel: "THEME", bestLuck: "LUCKY COMBINATIONS",
+    shareCard: "Share Card", shareSns: "SNS", shareInvite: "Invite",
+    shareSave: "Save Image", shareCopyLink: "Copy Link", shareCopied: "Copied!",
+    shareRewardDesc: "Share to earn +1 free consultation today",
+    shareBonus: "+1 Consultation Earned!", shareTodayLimit: "Daily reward limit reached"
   },
   ko: {
     title: "K-포춘", subtitle: "신비로운 운세 상담소", invoke: "번호 생성", records: "행운 기록", oracle: "운세 상담", board: "행운 광장",
@@ -33,7 +37,11 @@ export const TRANSLATIONS: Record<Lang, Translation> = {
     onbTitle3: "루틴 알람", onbDesc3: "로또 데이 알람을 설정하여 행운의 타이밍을 놓치지 마세요.",
     next: "다음", start: "운명 시작하기",
     chatWelcome: "당신의 맑은 기운이 느껴집니다.", chatAskMood: "오늘의 기분은 어떠신가요?", chatActionGen: "운명의 번호 생성하기", chatReset: "상담 다시 시작하기",
-    themeLabel: "테마 설정", bestLuck: "행운의 조합"
+    themeLabel: "테마 설정", bestLuck: "행운의 조합",
+    shareCard: "카드 공유", shareSns: "SNS", shareInvite: "친구 초대",
+    shareSave: "이미지 저장", shareCopyLink: "링크 복사", shareCopied: "복사됨!",
+    shareRewardDesc: "공유하면 AI 상담 +1회 획득",
+    shareBonus: "상담 +1회 획득!", shareTodayLimit: "오늘 보상 한도 도달"
   },
   ja: {
     title: "K-運勢", subtitle: "神秘的な占いの館", invoke: "番号生成", records: "幸運の記録", oracle: "運勢診断", board: "幸運広場",
@@ -50,7 +58,11 @@ export const TRANSLATIONS: Record<Lang, Translation> = {
     onbTitle3: "ルーチンアラーム", onbDesc3: "宝くじの日のアラームを設定して、幸運のタイミングを逃さないようにしましょう。",
     next: "次へ", start: "運命を始める",
     chatWelcome: "あなたのオーラを感じます。", chatAskMood: "今日の気分はどうですか？", chatActionGen: "運命の番号を生成する", chatReset: "相談をやり直す",
-    themeLabel: "テーマ設定", bestLuck: "幸運の組み合わせ"
+    themeLabel: "テーマ設定", bestLuck: "幸運の組み合わせ",
+    shareCard: "カードシェア", shareSns: "SNS", shareInvite: "友達招待",
+    shareSave: "画像保存", shareCopyLink: "リンクコピー", shareCopied: "コピー済み!",
+    shareRewardDesc: "シェアして+1回無料相談をゲット",
+    shareBonus: "相談+1回ゲット!", shareTodayLimit: "本日の報酬上限に達しました"
   },
   es: {
     title: "K-Fortuna", subtitle: "Oráculo Místico", invoke: "Invocar", records: "Registros", oracle: "Oráculo", board: "Plaza",
@@ -67,6 +79,10 @@ export const TRANSLATIONS: Record<Lang, Translation> = {
     onbTitle3: "Mantén la Rutina", onbDesc3: "Configura alarmas para los días de lotería y no pierdas tu oportunidad.",
     next: "Siguiente", start: "Iniciar Destino",
     chatWelcome: "Siento tu aura.", chatAskMood: "¿Cómo está tu estado de ánimo hoy?", chatActionGen: "Generar Números de Destino", chatReset: "Reiniciar Consulta",
-    themeLabel: "Tema", bestLuck: "Combinaciones de Suerte"
+    themeLabel: "Tema", bestLuck: "Combinaciones de Suerte",
+    shareCard: "Tarjeta", shareSns: "Redes", shareInvite: "Invitar",
+    shareSave: "Guardar Imagen", shareCopyLink: "Copiar Enlace", shareCopied: "¡Copiado!",
+    shareRewardDesc: "Comparte y gana +1 consulta gratis hoy",
+    shareBonus: "¡+1 Consulta Obtenida!", shareTodayLimit: "Límite diario alcanzado"
   }
 };

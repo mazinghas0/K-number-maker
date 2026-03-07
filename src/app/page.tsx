@@ -13,6 +13,7 @@ import HistoryTab from "@/components/HistoryTab";
 import AgentTab from "@/components/AgentTab";
 import FortuneBoard from "@/components/FortuneBoard";
 import AlarmSettings from "@/components/AlarmSettings";
+import ShareModal from "@/components/ShareModal";
 
 const DESKTOP_TAB_ICONS: Partial<Record<TabType, string>> = {
   generate: "🎲", history: "📜", agent: "🔮", board: "🏛️", alarms: "⏰",
@@ -35,6 +36,7 @@ export default function Home() {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [tempProfile, setTempProfile] = useState<UserProfile>({ name: "", birthDate: "", birthTime: "" });
   const [showSidebar, setShowSidebar] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
   const [alarms, setAlarms] = useState<AlarmsState>({ lottoDay: false, resultCheck: false, time: "18:00" });
 
   const t = TRANSLATIONS[lang];
@@ -120,6 +122,11 @@ export default function Home() {
       setTimeout(() => {
         setAnimPhase("sort");
       }, (count + 3) * 180);
+
+      // 번호 생성 완료 후 공유 버튼 활성화 (애니메이션 끝난 뒤)
+      setTimeout(() => {
+        setShowShareModal(false); // 이전 모달 닫힘 상태 유지 (자동 오픈 원치 않으면)
+      }, (count + 4) * 180);
     }, 800);
   };
 
@@ -344,6 +351,29 @@ export default function Home() {
           100% { transform: scale(1) translateY(0); }
         }
       `}</style>
+
+      {/* 플로팅 공유 버튼 — 번호 생성 후 generate 탭에서 노출 */}
+      {numbers.length > 0 && activeTab === "generate" && !showShareModal && (
+        <button
+          onClick={() => { setShowShareModal(true); triggerHaptic(); }}
+          className="fixed bottom-36 md:bottom-8 right-6 md:right-8 z-50 flex items-center gap-2 px-5 py-3 rounded-full bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-black text-xs uppercase tracking-widest shadow-[0_8px_30px_rgba(212,175,55,0.4)] active:scale-95 transition-all hover:shadow-[0_8px_40px_rgba(212,175,55,0.6)] animate-in fade-in slide-in-from-bottom-2 duration-300"
+        >
+          <span className="text-base">↗</span> 공유
+        </button>
+      )}
+
+      {/* ShareModal */}
+      {showShareModal && (
+        <ShareModal
+          numbers={numbers}
+          onClose={() => setShowShareModal(false)}
+          luckyElement={luckyElement}
+          userProfile={userProfile}
+          activeTheme={activeTheme}
+          t={t}
+          onShareReward={() => {/* 보상은 ShareModal 내부에서 localStorage 직접 처리 */}}
+        />
+      )}
     </div>
   );
 }

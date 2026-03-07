@@ -14,8 +14,17 @@ export interface Translation {
   menu: string; myRules: string; alarms: string; settings: string;
   onbTitle1: string; onbDesc1: string; onbTitle2: string; onbDesc2: string; onbTitle3: string; onbDesc3: string; next: string; start: string;
   chatWelcome: string; chatAskMood: string; chatActionGen: string; chatReset: string;
-  themeLabel: string; // 추가 예정
-  bestLuck: string; // 추가 예정
+  themeLabel: string;
+  bestLuck: string;
+  shareCard: string;
+  shareSns: string;
+  shareInvite: string;
+  shareSave: string;
+  shareCopyLink: string;
+  shareCopied: string;
+  shareRewardDesc: string;
+  shareBonus: string;
+  shareTodayLimit: string;
 }
 
 export interface HistoryItem {
