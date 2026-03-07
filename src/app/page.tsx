@@ -203,7 +203,7 @@ export default function Home() {
   );
 
   return (
-    <div className={`transition-all duration-700 ${activeTheme.bg} ${activeTheme.text}`}>
+    <div className={`w-full min-h-screen transition-all duration-700 ${activeTheme.bg} ${activeTheme.text}`}>
       {/* ── Desktop: permanent sidebar (lg+) ───────────────────────── */}
       <aside className={`hidden lg:flex lg:flex-col lg:fixed lg:left-0 lg:top-0 lg:h-screen lg:w-72 ${activeTheme.card} border-r border-white/10 z-40`}>
         <Sidebar
@@ -250,9 +250,9 @@ export default function Home() {
           </div>
 
           {/* Desktop: current page indicator */}
-          <div className="hidden lg:flex items-center gap-3">
-            <span className="text-3xl">{DESKTOP_TAB_ICONS[activeTab] ?? "✨"}</span>
-            <span className="text-2xl font-black uppercase tracking-widest">
+          <div className="hidden lg:flex items-center gap-3 min-w-0">
+            <span className="text-2xl flex-shrink-0">{DESKTOP_TAB_ICONS[activeTab] ?? "✨"}</span>
+            <span className="text-xl font-black uppercase tracking-widest whitespace-nowrap">
               {activeTab === "generate" ? t.invoke
                 : activeTab === "history" ? t.records
                 : activeTab === "agent" ? t.oracle
