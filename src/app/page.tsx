@@ -171,6 +171,12 @@ export default function Home() {
     triggerHaptic();
   };
 
+  const handleDeleteHistory = async (id: string) => {
+    await supabase.from("lotto_history").delete().eq("id", id);
+    setHistory(prev => prev.filter(h => h.id !== id));
+    triggerHaptic();
+  };
+
   const tabContent = (
     <>
       {activeTab === "generate" && (
@@ -207,7 +213,7 @@ export default function Home() {
         <FortuneBoard lang={lang} board={board} activeTheme={activeTheme} onBless={handleBless} />
       )}
       {activeTab === "history" && (
-        <HistoryTab history={history} activeTheme={activeTheme} t={t} user={user} onLogin={handleLogin} />
+        <HistoryTab history={history} activeTheme={activeTheme} t={t} user={user} onLogin={handleLogin} onDelete={handleDeleteHistory} />
       )}
       {activeTab === "alarms" && (
         <AlarmSettings lang={lang} alarms={alarms} setAlarms={setAlarms} activeTheme={activeTheme} />
