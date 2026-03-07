@@ -205,7 +205,7 @@ export default function Home() {
   return (
     <div className={`w-full min-h-screen transition-all duration-700 ${activeTheme.bg} ${activeTheme.text}`}>
       {/* ── Desktop: permanent sidebar (lg+) ───────────────────────── */}
-      <aside className={`hidden lg:flex lg:flex-col lg:fixed lg:left-0 lg:top-0 lg:h-screen lg:w-72 ${activeTheme.card} border-r border-white/10 z-40`}>
+      <aside className={`hidden md:flex md:flex-col md:fixed md:left-0 md:top-0 md:h-screen md:w-72 ${activeTheme.card} border-r border-white/10 z-40`}>
         <Sidebar
           mode="permanent"
           activeTab={activeTab}
@@ -231,26 +231,26 @@ export default function Home() {
       />
 
       {/* ── Main content (shifts right on desktop) ──────────────────── */}
-      <div className="lg:ml-72 flex flex-col min-h-screen">
+      <div className="md:ml-72 flex flex-col min-h-screen">
 
         {/* Header */}
-        <header className={`px-6 lg:px-10 py-5 lg:py-6 flex justify-between items-center sticky top-0 ${activeTheme.bg}/90 backdrop-blur-xl z-30`}>
+        <header className={`px-6 md:px-10 py-5 md:py-6 flex justify-between items-center sticky top-0 ${activeTheme.bg}/90 backdrop-blur-xl z-30`}>
           {/* Mobile: hamburger */}
           <button
             onClick={() => setShowSidebar(true)}
-            className={`lg:hidden p-3 bg-white/10 rounded-full hover:scale-110 transition-transform`}
+            className={`md:hidden p-3 bg-white/10 rounded-full hover:scale-110 transition-transform`}
           >
             <span className="text-2xl">☰</span>
           </button>
 
           {/* Mobile: centered title */}
-          <div className="lg:hidden flex flex-col items-center">
+          <div className="md:hidden flex flex-col items-center">
             <h1 className="text-4xl font-black italic tracking-tighter">{t.title}</h1>
             <p className={`text-xs font-bold uppercase tracking-[0.3em] ${activeTheme.accent}`}>{t.subtitle}</p>
           </div>
 
           {/* Desktop: current page indicator */}
-          <div className="hidden lg:flex items-center gap-3 min-w-0">
+          <div className="hidden md:flex items-center gap-3 min-w-0">
             <span className="text-2xl flex-shrink-0">{DESKTOP_TAB_ICONS[activeTab] ?? "✨"}</span>
             <span className="text-xl font-black uppercase tracking-widest whitespace-nowrap">
               {activeTab === "generate" ? t.invoke
@@ -276,12 +276,12 @@ export default function Home() {
         </header>
 
         {/* Main content */}
-        <main className="flex-1 px-6 lg:px-12 py-8 pb-40 lg:pb-12">
+        <main className="flex-1 px-6 md:px-12 py-8 pb-40 md:pb-12">
           {tabContent}
         </main>
 
         {/* Mobile bottom nav (hidden on desktop) */}
-        <nav className={`lg:hidden fixed bottom-10 left-1/2 -translate-x-1/2 w-[92%] max-w-[480px] ${activeTheme.card}/95 backdrop-blur-3xl border border-white/10 flex justify-around items-center py-6 z-20 rounded-[3.5rem] shadow-[0_25px_60px_rgba(0,0,0,0.4)]`}>
+        <nav className={`md:hidden fixed bottom-10 left-1/2 -translate-x-1/2 w-[92%] max-w-[480px] ${activeTheme.card}/95 backdrop-blur-3xl border border-white/10 flex justify-around items-center py-6 z-20 rounded-[3.5rem] shadow-[0_25px_60px_rgba(0,0,0,0.4)]`}>
           {(["generate", "agent", "board", "history"] as TabType[]).map(tab => (
             <button
               key={tab}
