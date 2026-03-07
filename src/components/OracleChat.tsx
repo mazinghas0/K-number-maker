@@ -6,7 +6,7 @@ import { Lang, ChatMessage, UserProfile, ElementInfo, ThemeColors } from "@/lib/
 import { TRANSLATIONS } from "@/lib/translations";
 
 const FREE_LIMIT = 3;
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent`;
+const GEMINI_PROXY = "/api/gemini";
 
 const SYSTEM_PROMPT = `당신은 수십 년 경력의 명리학(命理學) 전문가이자 운세 상담사입니다.
 사주팔자(四柱八字), 오행(五行: 목화토금수), 천간(天干: 갑을병정무기경신임계), 지지(地支: 자축인묘진사오미신유술해), 용신(用神), 기신(忌神), 십성(十星), 대운(大運), 세운(歲運) 개념을 완전히 이해하고 있습니다.
@@ -110,7 +110,6 @@ export default function OracleChat({ lang, userProfile, luckyElement, activeThem
     setIsStreaming(true);
 
     try {
-      const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
       const userContext = `\n\n사용자 정보:\n- 이름: ${userProfile.name}\n- 생년월일: ${userProfile.birthDate}\n- 타고난 일간: ${luckyElement.ilgan}\n- 오행 본질: ${luckyElement.attribute}\n- 행운 번호 범위: ${luckyElement.range[0]}~${luckyElement.range[1]}\n- 대화 언어: ${lang}`;
 
       const historyForAPI = [...messages, userMsg].filter(m => m.text);
@@ -125,7 +124,7 @@ export default function OracleChat({ lang, userProfile, luckyElement, activeThem
         generationConfig: { temperature: 0.9, maxOutputTokens: 400 },
       };
 
-      const res = await fetch(`${GEMINI_URL}?key=${apiKey}`, {
+      const res = await fetch(GEMINI_PROXY, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
