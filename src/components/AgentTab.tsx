@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { User } from "@supabase/supabase-js";
 import { Lang, UserProfile, ElementInfo, ThemeColors, Translation } from "@/lib/types";
 import OracleChat from "./OracleChat";
 
@@ -12,14 +13,14 @@ interface Props {
   onProfileSubmit: (p: UserProfile) => void;
   luckyElement: ElementInfo;
   activeTheme: ThemeColors;
-  isGenerating: boolean;
-  onGenerate: () => Promise<void>;
   t: Translation;
+  user: User | null;
+  onLogin: () => void;
 }
 
 export default function AgentTab({
   lang, userProfile, tempProfile, onTempProfileChange, onProfileSubmit,
-  luckyElement, activeTheme, isGenerating, onGenerate, t,
+  luckyElement, activeTheme, t, user, onLogin,
 }: Props) {
   if (!userProfile) {
     return (
@@ -62,8 +63,8 @@ export default function AgentTab({
       userProfile={userProfile}
       luckyElement={luckyElement}
       activeTheme={activeTheme}
-      isGenerating={isGenerating}
-      onGenerate={onGenerate}
+      user={user}
+      onLogin={onLogin}
     />
   );
 }

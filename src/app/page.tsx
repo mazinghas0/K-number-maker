@@ -204,9 +204,9 @@ export default function Home() {
           onProfileSubmit={handleProfileSubmit}
           luckyElement={luckyElement}
           activeTheme={activeTheme}
-          isGenerating={isGenerating}
-          onGenerate={handleOracleGenerate}
           t={t}
+          user={user}
+          onLogin={handleLogin}
         />
       )}
       {activeTab === "board" && (

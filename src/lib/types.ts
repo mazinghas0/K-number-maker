@@ -66,10 +66,7 @@ export interface ElementInfo {
 export interface ChatMessage {
   id: string;
   sender: "oracle" | "user";
-  type: "text" | "mood-selector" | "action-generate" | "number-result";
-  text?: string;
-  numbers?: number[];
-  story?: string;
+  text: string;
 }
 
 export interface AlarmsState {
