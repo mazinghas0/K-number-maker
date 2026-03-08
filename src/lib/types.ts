@@ -37,6 +37,7 @@ export interface Translation {
   mbtiCompat: string;
   mbtiShareBtn: string;
   mbtiKeywords: string;
+  historyLoginMsg: string;
   tcTitle: string;
   tcSealBtn: string;
   tcMessage: string;

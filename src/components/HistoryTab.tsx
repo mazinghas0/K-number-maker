@@ -218,7 +218,7 @@ export default function HistoryTab({ history, activeTheme, t, user, onLogin, onD
         <div className="text-center py-20 bg-white/5 rounded-[3.5rem] p-10 space-y-8 border border-dashed border-white/10">
           <div className="text-7xl opacity-20">🔒</div>
           <p className="text-base font-bold text-gray-500 leading-relaxed">
-            로그인하시면 클라우드에 영구적으로{"\n"}기록을 보관할 수 있습니다.
+            {t.historyLoginMsg}
           </p>
           <button
             onClick={onLogin}

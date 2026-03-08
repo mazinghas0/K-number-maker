@@ -397,9 +397,9 @@ export default function Home() {
       {numbers.length > 0 && activeTab === "generate" && !showShareModal && (
         <button
           onClick={() => { setShowShareModal(true); triggerHaptic(); }}
-          className="fixed bottom-36 md:bottom-8 right-6 md:right-8 z-50 flex items-center gap-2 px-5 py-3 rounded-full bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-black text-xs uppercase tracking-widest shadow-[0_8px_30px_rgba(212,175,55,0.4)] active:scale-95 transition-all hover:shadow-[0_8px_40px_rgba(212,175,55,0.6)] animate-in fade-in slide-in-from-bottom-2 duration-300"
+          className="fixed bottom-44 md:bottom-14 right-6 md:right-8 z-50 flex items-center gap-2 px-5 py-3 rounded-full bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-black text-xs uppercase tracking-widest shadow-[0_8px_30px_rgba(212,175,55,0.4)] active:scale-95 transition-all hover:shadow-[0_8px_40px_rgba(212,175,55,0.6)] animate-in fade-in slide-in-from-bottom-2 duration-300"
         >
-          <span className="text-base">↗</span> 공유
+          <span className="text-base">↗</span> {t.shareCard}
         </button>
       )}
 

@@ -76,8 +76,8 @@ export default function Sidebar({
               : "hover:bg-white/5 opacity-60 hover:opacity-100"
           }`}
         >
-          <span className="text-2xl">{TAB_ICONS[tab]}</span>
-          <span>{TAB_LABELS[tab]}</span>
+          <span className="text-2xl flex-shrink-0">{TAB_ICONS[tab]}</span>
+          <span className="truncate">{TAB_LABELS[tab]}</span>
         </button>
       ))}
     </div>
