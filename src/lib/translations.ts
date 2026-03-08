@@ -23,7 +23,14 @@ export const TRANSLATIONS: Record<Lang, Translation> = {
     shareBonus: "+1 Consultation Earned!", shareTodayLimit: "Daily reward limit reached",
     boardSortPopular: "Popular", boardSortLatest: "Latest",
     boardNickLabel: "Nickname", boardEmptyMsg: "Be the first to share your luck!",
-    boardWriteBtn: "Write", boardPosting: "Posting...", boardDeleteConfirm: "Delete"
+    boardWriteBtn: "Write", boardPosting: "Posting...", boardDeleteConfirm: "Delete",
+    mbtiTitle: "My Fortune Type", mbtiRarity: "Rarity", mbtiCompat: "Best Match",
+    mbtiShareBtn: "Share Type", mbtiKeywords: "Keywords",
+    tcTitle: "Time Capsule", tcSealBtn: "Seal Numbers", tcMessage: "Message to future self...",
+    tcOpenIn: "Opens in", tcCountdown: "days", tcOpened: "Open Now!", tcEmpty: "No capsules yet.",
+    tcDays7: "7 days", tcDays30: "30 days", tcDays100: "100 days",
+    twinsTitle: "Fortune Twins", twinsFound: "people share your numbers!", twinsNone: "You are unique.",
+    worldTitle: "World Activity", winCertBtn: "Certify Win", winBadge: "WINNER"
   },
   ko: {
     title: "K-포춘", subtitle: "신비로운 운세 상담소", invoke: "번호 생성", records: "행운 기록", oracle: "운세 상담", board: "행운 광장",
@@ -47,7 +54,14 @@ export const TRANSLATIONS: Record<Lang, Translation> = {
     shareBonus: "상담 +1회 획득!", shareTodayLimit: "오늘 보상 한도 도달",
     boardSortPopular: "인기순", boardSortLatest: "최신순",
     boardNickLabel: "닉네임", boardEmptyMsg: "첫 번째로 행운을 공유해보세요!",
-    boardWriteBtn: "글쓰기", boardPosting: "게시 중...", boardDeleteConfirm: "삭제"
+    boardWriteBtn: "글쓰기", boardPosting: "게시 중...", boardDeleteConfirm: "삭제",
+    mbtiTitle: "내 운명 유형", mbtiRarity: "희귀도", mbtiCompat: "궁합 유형",
+    mbtiShareBtn: "유형 공유", mbtiKeywords: "키워드",
+    tcTitle: "타임캡슐", tcSealBtn: "번호 봉인하기", tcMessage: "미래의 나에게...",
+    tcOpenIn: "개봉까지", tcCountdown: "일", tcOpened: "지금 개봉!", tcEmpty: "아직 봉인된 캡슐이 없습니다.",
+    tcDays7: "7일 후", tcDays30: "30일 후", tcDays100: "100일 후",
+    twinsTitle: "운명의 쌍둥이", twinsFound: "명이 같은 번호를 뽑았어요!", twinsNone: "당신만의 유일한 번호예요.",
+    worldTitle: "세계 현황", winCertBtn: "당첨 인증", winBadge: "당첨"
   },
   ja: {
     title: "K-運勢", subtitle: "神秘的な占いの館", invoke: "番号生成", records: "幸運の記録", oracle: "運勢診断", board: "幸運広場",
@@ -71,7 +85,14 @@ export const TRANSLATIONS: Record<Lang, Translation> = {
     shareBonus: "相談+1回ゲット!", shareTodayLimit: "本日の報酬上限に達しました",
     boardSortPopular: "人気順", boardSortLatest: "最新順",
     boardNickLabel: "ニックネーム", boardEmptyMsg: "最初の幸運をシェアしよう!",
-    boardWriteBtn: "投稿", boardPosting: "投稿中...", boardDeleteConfirm: "削除"
+    boardWriteBtn: "投稿", boardPosting: "投稿中...", boardDeleteConfirm: "削除",
+    mbtiTitle: "私の運命タイプ", mbtiRarity: "希少度", mbtiCompat: "相性タイプ",
+    mbtiShareBtn: "タイプをシェア", mbtiKeywords: "キーワード",
+    tcTitle: "タイムカプセル", tcSealBtn: "番号を封印", tcMessage: "未来の自分へ...",
+    tcOpenIn: "開封まで", tcCountdown: "日", tcOpened: "今すぐ開封!", tcEmpty: "カプセルがありません。",
+    tcDays7: "7日後", tcDays30: "30日後", tcDays100: "100日後",
+    twinsTitle: "運命のツイン", twinsFound: "人が同じ番号を引きました!", twinsNone: "あなただけのユニークな番号です。",
+    worldTitle: "世界の状況", winCertBtn: "当選認証", winBadge: "当選"
   },
   es: {
     title: "K-Fortuna", subtitle: "Oráculo Místico", invoke: "Invocar", records: "Registros", oracle: "Oráculo", board: "Plaza",
@@ -95,6 +116,13 @@ export const TRANSLATIONS: Record<Lang, Translation> = {
     shareBonus: "¡+1 Consulta Obtenida!", shareTodayLimit: "Límite diario alcanzado",
     boardSortPopular: "Popular", boardSortLatest: "Reciente",
     boardNickLabel: "Apodo", boardEmptyMsg: "¡Sé el primero en compartir tu suerte!",
-    boardWriteBtn: "Escribir", boardPosting: "Publicando...", boardDeleteConfirm: "Eliminar"
+    boardWriteBtn: "Escribir", boardPosting: "Publicando...", boardDeleteConfirm: "Eliminar",
+    mbtiTitle: "Mi Tipo de Destino", mbtiRarity: "Rareza", mbtiCompat: "Afinidad",
+    mbtiShareBtn: "Compartir Tipo", mbtiKeywords: "Palabras Clave",
+    tcTitle: "Cápsula del Tiempo", tcSealBtn: "Sellar Números", tcMessage: "Para mi yo del futuro...",
+    tcOpenIn: "Se abre en", tcCountdown: "días", tcOpened: "¡Abrir Ahora!", tcEmpty: "Sin cápsulas aún.",
+    tcDays7: "7 días", tcDays30: "30 días", tcDays100: "100 días",
+    twinsTitle: "Gemelos del Destino", twinsFound: "personas tienen los mismos números!", twinsNone: "Tus números son únicos.",
+    worldTitle: "Actividad Mundial", winCertBtn: "Certificar Premio", winBadge: "GANADOR"
   }
 };

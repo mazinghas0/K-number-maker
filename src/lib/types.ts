@@ -32,6 +32,27 @@ export interface Translation {
   boardWriteBtn: string;
   boardPosting: string;
   boardDeleteConfirm: string;
+  mbtiTitle: string;
+  mbtiRarity: string;
+  mbtiCompat: string;
+  mbtiShareBtn: string;
+  mbtiKeywords: string;
+  tcTitle: string;
+  tcSealBtn: string;
+  tcMessage: string;
+  tcOpenIn: string;
+  tcCountdown: string;
+  tcOpened: string;
+  tcEmpty: string;
+  tcDays7: string;
+  tcDays30: string;
+  tcDays100: string;
+  twinsTitle: string;
+  twinsFound: string;
+  twinsNone: string;
+  worldTitle: string;
+  winCertBtn: string;
+  winBadge: string;
 }
 
 export interface HistoryItem {
@@ -51,6 +72,18 @@ export interface BoardItem {
   lucky_numbers: number[];
   created_at: string;
   blessings: number;
+  is_winner: boolean;
+  country_code: string;
+}
+
+export interface TimeCapsuleItem {
+  id: string;
+  device_id: string;
+  numbers: number[];
+  message: string;
+  open_at: string;
+  created_at: string;
+  is_opened: boolean;
 }
 
 export interface PostBoardPayload {
@@ -58,6 +91,7 @@ export interface PostBoardPayload {
   content: string;
   lucky_numbers: number[];
   user_id: string | null;
+  country_code: string;
 }
 
 export interface LotteryPreset {
@@ -97,6 +131,25 @@ export interface AlarmsState {
   lottoDay: boolean;
   resultCheck: boolean;
   time: string;
+}
+
+export type FortuneElement = "목" | "화" | "토" | "금" | "수" | "복합";
+export type FortuneTrait = "강" | "유" | "균형";
+
+export interface FortuneType {
+  id: string;
+  name: string;
+  emoji: string;
+  element: FortuneElement;
+  trait: FortuneTrait;
+  rarity: number;
+  color: string;
+  gradientFrom: string;
+  gradientTo: string;
+  keywords: string[];
+  desc: Record<"ko" | "en" | "ja" | "es", string>;
+  compatId: string;
+  compatName: string;
 }
 
 export interface ThemeColors {

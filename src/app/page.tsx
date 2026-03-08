@@ -178,6 +178,12 @@ export default function Home() {
     setBoard((prev) => prev.filter((b) => b.id !== id));
   };
 
+  const handleWinCert = async (id: string) => {
+    triggerHaptic();
+    await supabase.from("fortune_board").update({ is_winner: true }).eq("id", id);
+    setBoard((prev) => prev.map((b) => b.id === id ? { ...b, is_winner: true } : b));
+  };
+
   const handleProfileSubmit = (p: UserProfile) => {
     localStorage.setItem("k-fortune-profile", JSON.stringify(p));
     setUserProfile(p);
@@ -249,6 +255,7 @@ export default function Home() {
           onBless={handleBless}
           onPost={handlePostBoard}
           onDelete={handleDeleteBoard}
+          onWinCert={handleWinCert}
           user={user}
           numbers={numbers}
         />

@@ -5,6 +5,19 @@ import { User } from "@supabase/supabase-js";
 import { BoardItem, ThemeColors, Translation, PostBoardPayload } from "@/lib/types";
 import { getBallColor } from "@/lib/fortuneEngine";
 
+// ── 국가 코드 → 플래그 이모지 ─────────────────────────────────────
+function toFlag(cc: string): string {
+  if (!cc || cc.length < 2) return "🌍";
+  return cc.toUpperCase().split("").map(c => String.fromCodePoint(0x1F1E6 + c.charCodeAt(0) - 65)).join("");
+}
+
+function detectCountryCode(): string {
+  if (typeof window === "undefined") return "";
+  const lang = navigator.language || "";
+  const parts = lang.split("-");
+  return parts.length > 1 ? parts[parts.length - 1].toUpperCase() : "";
+}
+
 // ── 익명 닉네임 생성 ──────────────────────────────────────────────
 const ADJ = ["행운의", "황금의", "신비한", "빛나는", "용감한", "지혜로운", "고요한", "강한"];
 const ANIMALS = ["여우", "용", "호랑이", "봉황", "거북", "독수리", "사자", "늑대"];
@@ -64,6 +77,7 @@ interface Props {
   onBless: (id: string) => Promise<void>;
   onPost: (payload: PostBoardPayload) => Promise<string | null>;
   onDelete: (id: string) => Promise<void>;
+  onWinCert: (id: string) => Promise<void>;
   user: User | null;
   numbers: number[];
 }
@@ -76,6 +90,7 @@ export default function FortuneBoard({
   onBless,
   onPost,
   onDelete,
+  onWinCert,
   user,
   numbers,
 }: Props) {
@@ -86,13 +101,25 @@ export default function FortuneBoard({
   const [posting, setPosting] = useState(false);
   const [blessedIds, setBlessedIds] = useState<string[]>([]);
   const [myPostIds, setMyPostIds] = useState<string[]>([]);
+  const [countryCode, setCountryCode] = useState("");
 
   // 클라이언트 마운트 후 localStorage 읽기
   useEffect(() => {
     setBlessedIds(getBlessedToday());
     setMyPostIds(getMyPosts());
     setNickname(user?.user_metadata?.full_name ?? genAnonymousName());
+    setCountryCode(detectCountryCode());
   }, [user]);
+
+  // 세계 현황 집계 (Phase 5)
+  const worldData = useMemo(() => {
+    const counts: Record<string, number> = {};
+    board.forEach((p) => {
+      const cc = p.country_code;
+      if (cc) counts[cc] = (counts[cc] || 0) + 1;
+    });
+    return Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 8);
+  }, [board]);
 
   // 정렬된 게시물
   const sorted = useMemo<BoardItem[]>(() => {
@@ -123,6 +150,7 @@ export default function FortuneBoard({
       content: message.trim(),
       lucky_numbers: numbers.length > 0 ? numbers : [],
       user_id: user?.id ?? null,
+      country_code: countryCode,
     });
     if (newId) {
       addMyPost(newId);
@@ -181,6 +209,21 @@ export default function FortuneBoard({
           {showForm ? "✕ 닫기" : `✍ ${t.boardWriteBtn}`}
         </button>
       </div>
+
+      {/* 세계 현황 (Phase 5) */}
+      {worldData.length > 0 && (
+        <div className={`${activeTheme.card} rounded-2xl px-5 py-3 border border-white/5`}>
+          <p className="text-[10px] font-black uppercase tracking-widest text-white/40 mb-2">{t.worldTitle}</p>
+          <div className="flex gap-3 flex-wrap">
+            {worldData.map(([cc, count]) => (
+              <div key={cc} className="flex items-center gap-1.5">
+                <span className="text-lg">{toFlag(cc)}</span>
+                <span className="text-xs font-black text-white/60">{count}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* 글쓰기 폼 */}
       {showForm && (
@@ -290,13 +333,22 @@ export default function FortuneBoard({
             <div
               key={post.id}
               className={`relative overflow-hidden p-6 rounded-3xl border transition-all duration-300 hover:scale-[1.005] ${
-                rank
+                post.is_winner
+                  ? "bg-gradient-to-br from-yellow-500/15 to-transparent border-yellow-500/40 shadow-[0_0_30px_rgba(234,179,8,0.15)]"
+                  : rank
                   ? rank.card
                   : `${activeTheme.card} border-white/5`
               }`}
             >
+              {/* 당첨 인증 뱃지 (Phase 6) */}
+              {post.is_winner && (
+                <div className="absolute top-0 left-0 text-[10px] font-black px-4 py-1.5 rounded-br-2xl uppercase tracking-widest bg-yellow-500 text-black">
+                  🏆 {t.winBadge}
+                </div>
+              )}
+
               {/* 순위 뱃지 */}
-              {rank && (
+              {!post.is_winner && rank && (
                 <div className={`absolute top-0 right-0 text-[10px] font-black px-4 py-1.5 rounded-bl-2xl uppercase tracking-widest ${rank.badge}`}>
                   {rank.label}
                 </div>
@@ -337,6 +389,16 @@ export default function FortuneBoard({
                     <span className="text-base">{blessed ? "✓" : "🍀"}</span>
                     <span>{post.blessings ?? 0}</span>
                   </button>
+
+                  {/* 당첨 인증 버튼 (내 게시물 + 미인증) */}
+                  {mine && !post.is_winner && (
+                    <button
+                      onClick={() => onWinCert(post.id)}
+                      className="text-[10px] font-black px-2 py-1 rounded-full bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/20 transition-all"
+                    >
+                      🏆 {t.winCertBtn}
+                    </button>
+                  )}
 
                   {/* 삭제 버튼 (내 게시물만) */}
                   {mine && (

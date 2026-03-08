@@ -5,6 +5,8 @@ import { LotteryPreset, ThemeColors, Translation, AnimPhase, FortuneType, Lang }
 import { LOTTERY_PRESETS } from "@/lib/constants";
 import { getBallColor } from "@/lib/fortuneEngine";
 import FortuneMBTI from "@/components/FortuneMBTI";
+import LuckyTwins from "@/components/LuckyTwins";
+import TimeCapsule from "@/components/TimeCapsule";
 
 interface Props {
   selectedLotto: LotteryPreset;
@@ -173,6 +175,16 @@ export default function GenerateTab({
           activeTheme={activeTheme}
           t={t}
         />
+      )}
+
+      {/* 운명의 쌍둥이 (Phase 4) */}
+      {animPhase === "sort" && numbers.length > 0 && (
+        <LuckyTwins numbers={numbers} t={t} />
+      )}
+
+      {/* 타임캡슐 (Phase 3) */}
+      {numbers.length > 0 && (
+        <TimeCapsule numbers={numbers} t={t} activeTheme={activeTheme} />
       )}
 
       {/* 생성 버튼 */}
