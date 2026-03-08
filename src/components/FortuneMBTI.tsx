@@ -96,6 +96,31 @@ const KWMAP: Record<string, { en: string; ja: string; es: string }> = {
   "운명": { en: "Destiny", ja: "運命", es: "Destino" },
 };
 
+// ── 카드 이름 번역 테이블 ─────────────────────────────────────────
+const NAME_MAP: Record<string, { en: string; ja: string; es: string }> = {
+  "천년의 거목":   { en: "Ancient Tree",      ja: "千年の大木",     es: "Árbol Milenario" },
+  "봄의 새싹":    { en: "Spring Sprout",      ja: "春の新芽",       es: "Brote Primaveral" },
+  "폭풍의 드래곤": { en: "Storm Dragon",       ja: "嵐の龍",         es: "Dragón Tormentoso" },
+  "새벽의 불꽃":   { en: "Dawn Flame",         ja: "夜明けの炎",     es: "Llama del Alba" },
+  "대지의 수호자": { en: "Earth Guardian",     ja: "大地の守護者",   es: "Guardián de la Tierra" },
+  "풍요의 들판":   { en: "Fertile Field",      ja: "豊穣の野",       es: "Campo Fértil" },
+  "황금의 전사":   { en: "Golden Warrior",     ja: "黄金の戦士",     es: "Guerrero Dorado" },
+  "달빛의 검":    { en: "Moonlight Blade",     ja: "月光の剣",       es: "Espada Lunar" },
+  "깊은 바다":    { en: "Deep Ocean",          ja: "深い海",         es: "Océano Profundo" },
+  "맑은 샘물":    { en: "Still Water",         ja: "清らかな泉",     es: "Agua Clara" },
+  "숲의 현자":    { en: "Forest Sage",         ja: "森の賢者",       es: "Sabio del Bosque" },
+  "봉황의 후예":   { en: "Phoenix Heir",        ja: "鳳凰の末裔",     es: "Heredero del Fénix" },
+  "용암의 정수":   { en: "Lava Essence",        ja: "溶岩の精髄",     es: "Esencia de Lava" },
+  "북극의 수정":   { en: "Arctic Crystal",     ja: "北極の水晶",     es: "Cristal Ártico" },
+  "신비의 호수":   { en: "Mystic Lake",         ja: "神秘の湖",       es: "Lago Místico" },
+  "우주의 중심":   { en: "Cosmic Center",       ja: "宇宙の中心",     es: "Centro Cósmico" },
+};
+
+function translateName(name: string, lang: Lang): string {
+  if (lang === "ko") return name;
+  return NAME_MAP[name]?.[lang as "en" | "ja" | "es"] ?? name;
+}
+
 function translateKw(kw: string, lang: Lang): string {
   if (lang === "ko") return kw;
   return KWMAP[kw]?.[lang as "en" | "ja" | "es"] ?? kw;
@@ -171,7 +196,7 @@ export default function FortuneMBTI({ fortuneType: ft, lang, numbers, activeThem
       // Type name
       ctx.font = "bold 52px sans-serif";
       ctx.fillStyle = "#ffffff";
-      ctx.fillText(ft.name, W / 2, 300);
+      ctx.fillText(translateName(ft.name, lang), W / 2, 300);
 
       // Desc
       const desc = ft.desc[lang] ?? ft.desc.en;
@@ -256,7 +281,7 @@ export default function FortuneMBTI({ fortuneType: ft, lang, numbers, activeThem
       ctx.font = "22px sans-serif";
       ctx.fillStyle = "#ffffff66";
       ctx.textAlign = "center";
-      const compatLine = `${getCompatLabel(lang)}: ${ft.compatName}`;
+      const compatLine = `${getCompatLabel(lang)}: ${translateName(ft.compatName, lang)}`;
       ctx.fillText(compatLine, W / 2, compatY);
 
       // Watermark
@@ -329,7 +354,7 @@ export default function FortuneMBTI({ fortuneType: ft, lang, numbers, activeThem
         {/* Emoji + name */}
         <div className="text-center mb-3">
           <div className="text-6xl mb-2">{ft.emoji}</div>
-          <div className="text-2xl font-black text-white">{ft.name}</div>
+          <div className="text-2xl font-black text-white">{translateName(ft.name, lang)}</div>
           <div className="text-xs font-bold uppercase tracking-widest mt-1" style={{ color: ft.color }}>
             {t.mbtiTitle}
           </div>
@@ -357,7 +382,7 @@ export default function FortuneMBTI({ fortuneType: ft, lang, numbers, activeThem
         {/* Best match */}
         <div className="flex justify-center items-center gap-2 text-sm text-white/60">
           <span className="font-bold text-white/40">{getCompatLabel(lang)}</span>
-          <span className="font-bold" style={{ color: ft.color }}>{ft.compatName}</span>
+          <span className="font-bold" style={{ color: ft.color }}>{translateName(ft.compatName, lang)}</span>
         </div>
       </div>
     </div>

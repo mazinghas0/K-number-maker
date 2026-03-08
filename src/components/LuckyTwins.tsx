@@ -32,7 +32,8 @@ export default function LuckyTwins({ numbers, t }: Props) {
       .limit(50)
       .then(({ data }) => {
         if (data) {
-          const MIN_OVERLAP = Math.max(3, Math.floor(numbers.length * 0.5));
+          // 4개 이상 겹치는 경우만 쌍둥이로 판정 (6개 번호 기준 67% 이상)
+        const MIN_OVERLAP = Math.max(4, Math.ceil(numbers.length * 0.67));
           const matched: TwinPost[] = data
             .map((p) => ({
               user_name: p.user_name as string,
