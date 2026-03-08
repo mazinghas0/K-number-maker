@@ -13,6 +13,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  icons: {
+    icon: [
+      { url: "/icon-192x192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512x512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: "/icon-192x192.png",
+  },
   title: "K-number Fortune | Your Mystic Destiny Oracle",
   description: "Experience the fusion of Eastern Five Elements philosophy and global destiny tools. Generate your lucky numbers with the guidance of the Mystic Oracle.",
   keywords: ["Lotto", "Fortune", "Oracle", "Lucky Numbers", "Five Elements", "Saju", "K-Fortune"],
