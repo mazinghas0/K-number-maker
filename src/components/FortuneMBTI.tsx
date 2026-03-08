@@ -35,6 +35,72 @@ function getCompatLabel(lang: Lang): string {
   return lang === "ko" ? "베스트 궁합" : lang === "ja" ? "ベスト相性" : lang === "es" ? "Mejor Afinidad" : "Best Match";
 }
 
+// ── 키워드 번역 테이블 ─────────────────────────────────────────────
+const KWMAP: Record<string, { en: string; ja: string; es: string }> = {
+  "성장": { en: "Growth", ja: "成長", es: "Crecimiento" },
+  "인내": { en: "Patience", ja: "忍耐", es: "Paciencia" },
+  "리더십": { en: "Leadership", ja: "リーダー", es: "Liderazgo" },
+  "뿌리": { en: "Roots", ja: "根", es: "Raíces" },
+  "시작": { en: "Beginning", ja: "始まり", es: "Inicio" },
+  "희망": { en: "Hope", ja: "希望", es: "Esperanza" },
+  "순수": { en: "Purity", ja: "純粋", es: "Pureza" },
+  "가능성": { en: "Potential", ja: "可能性", es: "Potencial" },
+  "열정": { en: "Passion", ja: "情熱", es: "Pasión" },
+  "승부": { en: "Combat", ja: "勝負", es: "Combate" },
+  "카리스마": { en: "Charisma", ja: "カリスマ", es: "Carisma" },
+  "폭발력": { en: "Explosive", ja: "爆発力", es: "Explosivo" },
+  "따뜻함": { en: "Warmth", ja: "温かさ", es: "Calidez" },
+  "창의력": { en: "Creative", ja: "創造力", es: "Creativo" },
+  "직관": { en: "Intuition", ja: "直感", es: "Intuición" },
+  "새벽": { en: "Dawn", ja: "夜明け", es: "Amanecer" },
+  "안정": { en: "Stability", ja: "安定", es: "Estabilidad" },
+  "신뢰": { en: "Trust", ja: "信頼", es: "Confianza" },
+  "재물": { en: "Wealth", ja: "財物", es: "Riqueza" },
+  "수호": { en: "Guardian", ja: "守護", es: "Guardián" },
+  "풍요": { en: "Abundance", ja: "豊かさ", es: "Abundancia" },
+  "수확": { en: "Harvest", ja: "収穫", es: "Cosecha" },
+  "나눔": { en: "Sharing", ja: "分かち合い", es: "Compartir" },
+  "감사": { en: "Gratitude", ja: "感謝", es: "Gratitud" },
+  "결단": { en: "Decision", ja: "決断", es: "Decisión" },
+  "승리": { en: "Victory", ja: "勝利", es: "Victoria" },
+  "의지": { en: "Will", ja: "意志", es: "Voluntad" },
+  "황금": { en: "Gold", ja: "黄金", es: "Oro" },
+  "예리함": { en: "Sharp", ja: "鋭さ", es: "Agudeza" },
+  "신비": { en: "Mystery", ja: "神秘", es: "Misterio" },
+  "고요": { en: "Serenity", ja: "静寂", es: "Serenidad" },
+  "깊이": { en: "Depth", ja: "深さ", es: "Profundidad" },
+  "지혜": { en: "Wisdom", ja: "知恵", es: "Sabiduría" },
+  "잠재력": { en: "Latent", ja: "潜在力", es: "Potencial" },
+  "폭발": { en: "Explosion", ja: "爆発", es: "Explosión" },
+  "흐름": { en: "Flow", ja: "流れ", es: "Flujo" },
+  "적응": { en: "Adapt", ja: "適応", es: "Adaptar" },
+  "치유": { en: "Healing", ja: "癒し", es: "Sanación" },
+  "균형": { en: "Balance", ja: "均衡", es: "Equilibrio" },
+  "자연": { en: "Nature", ja: "自然", es: "Naturaleza" },
+  "통찰": { en: "Insight", ja: "洞察", es: "Perspicacia" },
+  "부활": { en: "Revival", ja: "復活", es: "Renacimiento" },
+  "전설": { en: "Legend", ja: "伝説", es: "Leyenda" },
+  "불사": { en: "Immortal", ja: "不死", es: "Inmortal" },
+  "변화": { en: "Change", ja: "変化", es: "Cambio" },
+  "에너지": { en: "Energy", ja: "エネルギー", es: "Energía" },
+  "변환": { en: "Transform", ja: "変換", es: "Transformar" },
+  "창조": { en: "Creation", ja: "創造", es: "Creación" },
+  "희귀": { en: "Rare", ja: "希少", es: "Raro" },
+  "투명": { en: "Clarity", ja: "透明", es: "Claridad" },
+  "영원": { en: "Eternal", ja: "永遠", es: "Eterno" },
+  "반영": { en: "Reflection", ja: "反映", es: "Reflexión" },
+  "평온": { en: "Calm", ja: "平穏", es: "Calma" },
+  "우주": { en: "Cosmos", ja: "宇宙", es: "Cosmos" },
+  "전지전능": { en: "Omnipotent", ja: "全知全能", es: "Omnipotente" },
+  "초월": { en: "Transcend", ja: "超越", es: "Trascender" },
+  "운명": { en: "Destiny", ja: "運命", es: "Destino" },
+};
+
+function translateKw(kw: string, lang: Lang): string {
+  if (lang === "ko") return kw;
+  return KWMAP[kw]?.[lang as "en" | "ja" | "es"] ?? kw;
+}
+
 export default function FortuneMBTI({ fortuneType: ft, lang, numbers, activeTheme, t }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -127,27 +193,35 @@ export default function FortuneMBTI({ fortuneType: ft, lang, numbers, activeThem
       }
       if (line) ctx.fillText(line, W / 2, y);
 
-      // Keywords
-      const kwY = y + 60;
-      let kwX = 80;
+      // Keywords (번역 + 줄바꿈)
+      const kwPad = 12, kwGap = 10, kwH = 38, kwLineH = 52;
       ctx.font = "bold 22px sans-serif";
-      for (const kw of ft.keywords) {
-        const kw2 = "#" + kw;
+      const translatedKws = ft.keywords.map((kw) => "#" + translateKw(kw, lang));
+      let kwX = 80, kwRowY = y + 60;
+      for (const kw2 of translatedKws) {
         const kwW = ctx.measureText(kw2).width;
+        const tagW = kwW + kwPad * 2;
+        // 줄바꿈
+        if (kwX + tagW > W - 80 && kwX > 80) {
+          kwX = 80;
+          kwRowY += kwLineH;
+        }
         ctx.fillStyle = ft.color + "33";
         ctx.beginPath();
-        ctx.roundRect(kwX, kwY - 26, kwW + 24, 38, 19);
+        ctx.roundRect(kwX, kwRowY - 26, tagW, kwH, 19);
         ctx.fill();
         ctx.strokeStyle = ft.color + "88";
         ctx.lineWidth = 1;
         ctx.stroke();
         ctx.fillStyle = ft.color;
-        ctx.fillText(kw2, kwX + 12, kwY);
-        kwX += kwW + 42;
+        ctx.textAlign = "left";
+        ctx.fillText(kw2, kwX + kwPad, kwRowY);
+        kwX += tagW + kwGap;
       }
+      ctx.textAlign = "center";
 
       // Divider
-      const divY = kwY + 50;
+      const divY = kwRowY + 50;
       ctx.strokeStyle = ft.color + "44";
       ctx.lineWidth = 1;
       ctx.setLineDash([4, 8]);
@@ -272,7 +346,7 @@ export default function FortuneMBTI({ fortuneType: ft, lang, numbers, activeThem
               className="text-xs font-bold px-3 py-1 rounded-full border"
               style={{ color: ft.color, borderColor: ft.color + "66", background: ft.color + "22" }}
             >
-              #{kw}
+              #{translateKw(kw, lang)}
             </span>
           ))}
         </div>
