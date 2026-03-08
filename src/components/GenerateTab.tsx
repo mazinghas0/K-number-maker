@@ -1,12 +1,13 @@
 "use client";
 
 import React from "react";
-import { LotteryPreset, ThemeColors, Translation, AnimPhase, FortuneType, Lang } from "@/lib/types";
+import { LotteryPreset, ThemeColors, Translation, AnimPhase, FortuneType, Lang, IlginData } from "@/lib/types";
 import { LOTTERY_PRESETS } from "@/lib/constants";
 import { getBallColor } from "@/lib/fortuneEngine";
 import FortuneMBTI from "@/components/FortuneMBTI";
 import LuckyTwins from "@/components/LuckyTwins";
 import TimeCapsule from "@/components/TimeCapsule";
+import IlginCard from "@/components/IlginCard";
 
 interface Props {
   selectedLotto: LotteryPreset;
@@ -22,12 +23,13 @@ interface Props {
   t: Translation;
   lang: Lang;
   fortuneType: FortuneType | null;
+  ilginData: IlginData | null;
   onGenerate: () => void;
 }
 
 export default function GenerateTab({
   selectedLotto, onLottoChange, customSettings, onCustomChange,
-  numbers, shuffledNums, revealCount, animPhase, isGenerating, activeTheme, t, lang, fortuneType, onGenerate,
+  numbers, shuffledNums, revealCount, animPhase, isGenerating, activeTheme, t, lang, fortuneType, ilginData, onGenerate,
 }: Props) {
   const displayNums: number[] = animPhase === "sort" ? numbers : shuffledNums.slice(0, revealCount);
 
@@ -165,6 +167,16 @@ export default function GenerateTab({
           </div>
         )}
       </section>
+
+      {/* 오늘의 일진 카드 */}
+      {animPhase === "sort" && numbers.length > 0 && ilginData && (
+        <IlginCard
+          ilginData={ilginData}
+          lang={lang}
+          activeTheme={activeTheme}
+          t={t}
+        />
+      )}
 
       {/* 운명 MBTI 카드 */}
       {animPhase === "sort" && numbers.length > 0 && fortuneType && (

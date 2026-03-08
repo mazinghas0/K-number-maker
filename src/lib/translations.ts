@@ -31,7 +31,9 @@ export const TRANSLATIONS: Record<Lang, Translation> = {
     tcOpenIn: "Opens in", tcCountdown: "days", tcOpened: "Open Now!", tcEmpty: "No capsules yet.",
     tcDays7: "7 days", tcDays30: "30 days", tcDays100: "100 days",
     twinsTitle: "Fortune Twins", twinsFound: "people share your numbers!", twinsNone: "You are unique.",
-    worldTitle: "World Activity", winCertBtn: "Certify Win", winBadge: "WINNER"
+    worldTitle: "World Activity", winCertBtn: "Certify Win", winBadge: "WINNER",
+    ilginTitle: "Day Pillar", ilginScore: "Luck Index", ilginLuckyTime: "Lucky Hour",
+    ilginDirection: "Direction", ilginColor: "Color", ilginRelation: "Stem Harmony"
   },
   ko: {
     title: "K-포춘", subtitle: "신비로운 운세 상담소", invoke: "번호 생성", records: "행운 기록", oracle: "운세 상담", board: "행운 광장",
@@ -63,7 +65,9 @@ export const TRANSLATIONS: Record<Lang, Translation> = {
     tcOpenIn: "개봉까지", tcCountdown: "일", tcOpened: "지금 개봉!", tcEmpty: "아직 봉인된 캡슐이 없습니다.",
     tcDays7: "7일 후", tcDays30: "30일 후", tcDays100: "100일 후",
     twinsTitle: "운명의 쌍둥이", twinsFound: "명이 같은 번호를 뽑았어요!", twinsNone: "당신만의 유일한 번호예요.",
-    worldTitle: "세계 현황", winCertBtn: "당첨 인증", winBadge: "당첨"
+    worldTitle: "세계 현황", winCertBtn: "당첨 인증", winBadge: "당첨",
+    ilginTitle: "오늘의 일진", ilginScore: "행운 지수", ilginLuckyTime: "행운 시간",
+    ilginDirection: "행운 방향", ilginColor: "행운 색상", ilginRelation: "천간 궁합"
   },
   ja: {
     title: "K-運勢", subtitle: "神秘的な占いの館", invoke: "番号生成", records: "幸運の記録", oracle: "運勢診断", board: "幸運広場",
@@ -95,7 +99,9 @@ export const TRANSLATIONS: Record<Lang, Translation> = {
     tcOpenIn: "開封まで", tcCountdown: "日", tcOpened: "今すぐ開封!", tcEmpty: "カプセルがありません。",
     tcDays7: "7日後", tcDays30: "30日後", tcDays100: "100日後",
     twinsTitle: "運命のツイン", twinsFound: "人が同じ番号を引きました!", twinsNone: "あなただけのユニークな番号です。",
-    worldTitle: "世界の状況", winCertBtn: "当選認証", winBadge: "当選"
+    worldTitle: "世界の状況", winCertBtn: "当選認証", winBadge: "当選",
+    ilginTitle: "今日の日辰", ilginScore: "運気指数", ilginLuckyTime: "ラッキータイム",
+    ilginDirection: "ラッキー方角", ilginColor: "ラッキーカラー", ilginRelation: "天干の相性"
   },
   es: {
     title: "K-Fortuna", subtitle: "Oráculo Místico", invoke: "Invocar", records: "Registros", oracle: "Oráculo", board: "Plaza",
@@ -127,6 +133,8 @@ export const TRANSLATIONS: Record<Lang, Translation> = {
     tcOpenIn: "Se abre en", tcCountdown: "días", tcOpened: "¡Abrir Ahora!", tcEmpty: "Sin cápsulas aún.",
     tcDays7: "7 días", tcDays30: "30 días", tcDays100: "100 días",
     twinsTitle: "Gemelos del Destino", twinsFound: "personas tienen los mismos números!", twinsNone: "Tus números son únicos.",
-    worldTitle: "Actividad Mundial", winCertBtn: "Certificar Premio", winBadge: "GANADOR"
+    worldTitle: "Actividad Mundial", winCertBtn: "Certificar Premio", winBadge: "GANADOR",
+    ilginTitle: "Pilar del Día", ilginScore: "Índice de Suerte", ilginLuckyTime: "Hora Afortunada",
+    ilginDirection: "Dirección", ilginColor: "Color Afortunado", ilginRelation: "Armonía del Tallo"
   }
 };

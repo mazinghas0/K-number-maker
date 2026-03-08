@@ -54,6 +54,35 @@ export interface Translation {
   worldTitle: string;
   winCertBtn: string;
   winBadge: string;
+  ilginTitle: string;
+  ilginScore: string;
+  ilginLuckyTime: string;
+  ilginDirection: string;
+  ilginColor: string;
+  ilginRelation: string;
+}
+
+export type IlginRelation = "比和" | "我生" | "生我" | "我剋" | "剋我";
+export type IlginGrade = "대길" | "길" | "보통" | "주의" | "흉";
+
+export interface IlginData {
+  todayStemIdx: number;
+  todayBranchIdx: number;
+  todayGapja: string;
+  todayGapjaKo: string;
+  birthStemIdx: number;
+  birthStemKo: string;
+  elemMyIdx: number;
+  elemTodayIdx: number;
+  relation: IlginRelation;
+  luckyScore: number;
+  luckyGrade: IlginGrade;
+  luckyTimeRange: string;
+  luckyTimeName: string;
+  luckyDirection: string;
+  luckyColorHex: string;
+  luckyColorName: string;
+  advice: Record<"ko" | "en" | "ja" | "es", string>;
 }
 
 export interface HistoryItem {

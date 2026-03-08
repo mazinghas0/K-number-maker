@@ -3,10 +3,11 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { supabase } from "@/lib/supabase";
 import { User } from "@supabase/supabase-js";
-import { Lang, TabType, ThemeType, HistoryItem, BoardItem, UserProfile, AlarmsState, AnimPhase, PostBoardPayload } from "@/lib/types";
+import { Lang, TabType, ThemeType, HistoryItem, BoardItem, UserProfile, AlarmsState, AnimPhase, PostBoardPayload, IlginData } from "@/lib/types";
 import { TRANSLATIONS } from "@/lib/translations";
 import { analyzeDestiny } from "@/lib/fortuneEngine";
 import { calcFortuneType } from "@/lib/mbtiEngine";
+import { calcIlgin } from "@/lib/ilginEngine";
 import { LOTTERY_PRESETS, THEMES } from "@/lib/constants";
 import Sidebar from "@/components/Sidebar";
 import GenerateTab from "@/components/GenerateTab";
@@ -46,6 +47,10 @@ export default function Home() {
   const fortuneType = useMemo(
     () => (numbers.length > 0 ? calcFortuneType(luckyElement, numbers) : null),
     [luckyElement, numbers]
+  );
+  const ilginData = useMemo<IlginData | null>(
+    () => (userProfile?.birthDate ? calcIlgin(userProfile.birthDate) : null),
+    [userProfile]
   );
 
   const triggerHaptic = useCallback(() => {
@@ -230,6 +235,7 @@ export default function Home() {
           t={t}
           lang={lang}
           fortuneType={fortuneType}
+          ilginData={ilginData}
           onGenerate={handleGenerate}
         />
       )}
