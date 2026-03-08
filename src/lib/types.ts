@@ -25,6 +25,13 @@ export interface Translation {
   shareRewardDesc: string;
   shareBonus: string;
   shareTodayLimit: string;
+  boardSortPopular: string;
+  boardSortLatest: string;
+  boardNickLabel: string;
+  boardEmptyMsg: string;
+  boardWriteBtn: string;
+  boardPosting: string;
+  boardDeleteConfirm: string;
 }
 
 export interface HistoryItem {
@@ -38,11 +45,19 @@ export interface HistoryItem {
 
 export interface BoardItem {
   id: string;
+  user_id: string | null;
   user_name: string;
   content: string;
   lucky_numbers: number[];
   created_at: string;
-  blessings: number; // Phase 8을 대비한 미리 정의
+  blessings: number;
+}
+
+export interface PostBoardPayload {
+  user_name: string;
+  content: string;
+  lucky_numbers: number[];
+  user_id: string | null;
 }
 
 export interface LotteryPreset {

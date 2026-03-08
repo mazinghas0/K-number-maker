@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { supabase } from "@/lib/supabase";
 import { User } from "@supabase/supabase-js";
-import { Lang, TabType, ThemeType, HistoryItem, BoardItem, UserProfile, AlarmsState, AnimPhase } from "@/lib/types";
+import { Lang, TabType, ThemeType, HistoryItem, BoardItem, UserProfile, AlarmsState, AnimPhase, PostBoardPayload } from "@/lib/types";
 import { TRANSLATIONS } from "@/lib/translations";
 import { analyzeDestiny } from "@/lib/fortuneEngine";
 import { LOTTERY_PRESETS, THEMES } from "@/lib/constants";
@@ -155,6 +155,24 @@ export default function Home() {
     fetchBoard();
   };
 
+  const handlePostBoard = async (payload: PostBoardPayload): Promise<string | null> => {
+    triggerHaptic();
+    const { data, error } = await supabase
+      .from("fortune_board")
+      .insert([payload])
+      .select("id")
+      .single();
+    if (error || !data) return null;
+    fetchBoard();
+    return data.id as string;
+  };
+
+  const handleDeleteBoard = async (id: string) => {
+    triggerHaptic();
+    await supabase.from("fortune_board").delete().eq("id", id);
+    setBoard((prev) => prev.filter((b) => b.id !== id));
+  };
+
   const handleProfileSubmit = (p: UserProfile) => {
     localStorage.setItem("k-fortune-profile", JSON.stringify(p));
     setUserProfile(p);
@@ -217,7 +235,16 @@ export default function Home() {
         />
       )}
       {activeTab === "board" && (
-        <FortuneBoard lang={lang} board={board} activeTheme={activeTheme} onBless={handleBless} />
+        <FortuneBoard
+          board={board}
+          activeTheme={activeTheme}
+          t={t}
+          onBless={handleBless}
+          onPost={handlePostBoard}
+          onDelete={handleDeleteBoard}
+          user={user}
+          numbers={numbers}
+        />
       )}
       {activeTab === "history" && (
         <HistoryTab history={history} activeTheme={activeTheme} t={t} user={user} onLogin={handleLogin} onDelete={handleDeleteHistory} />

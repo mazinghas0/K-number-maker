@@ -20,7 +20,10 @@ export const TRANSLATIONS: Record<Lang, Translation> = {
     shareCard: "Share Card", shareSns: "SNS", shareInvite: "Invite",
     shareSave: "Save Image", shareCopyLink: "Copy Link", shareCopied: "Copied!",
     shareRewardDesc: "Share to earn +1 free consultation today",
-    shareBonus: "+1 Consultation Earned!", shareTodayLimit: "Daily reward limit reached"
+    shareBonus: "+1 Consultation Earned!", shareTodayLimit: "Daily reward limit reached",
+    boardSortPopular: "Popular", boardSortLatest: "Latest",
+    boardNickLabel: "Nickname", boardEmptyMsg: "Be the first to share your luck!",
+    boardWriteBtn: "Write", boardPosting: "Posting...", boardDeleteConfirm: "Delete"
   },
   ko: {
     title: "K-포춘", subtitle: "신비로운 운세 상담소", invoke: "번호 생성", records: "행운 기록", oracle: "운세 상담", board: "행운 광장",
@@ -41,7 +44,10 @@ export const TRANSLATIONS: Record<Lang, Translation> = {
     shareCard: "카드 공유", shareSns: "SNS", shareInvite: "친구 초대",
     shareSave: "이미지 저장", shareCopyLink: "링크 복사", shareCopied: "복사됨!",
     shareRewardDesc: "공유하면 AI 상담 +1회 획득",
-    shareBonus: "상담 +1회 획득!", shareTodayLimit: "오늘 보상 한도 도달"
+    shareBonus: "상담 +1회 획득!", shareTodayLimit: "오늘 보상 한도 도달",
+    boardSortPopular: "인기순", boardSortLatest: "최신순",
+    boardNickLabel: "닉네임", boardEmptyMsg: "첫 번째로 행운을 공유해보세요!",
+    boardWriteBtn: "글쓰기", boardPosting: "게시 중...", boardDeleteConfirm: "삭제"
   },
   ja: {
     title: "K-運勢", subtitle: "神秘的な占いの館", invoke: "番号生成", records: "幸運の記録", oracle: "運勢診断", board: "幸運広場",
@@ -62,7 +68,10 @@ export const TRANSLATIONS: Record<Lang, Translation> = {
     shareCard: "カードシェア", shareSns: "SNS", shareInvite: "友達招待",
     shareSave: "画像保存", shareCopyLink: "リンクコピー", shareCopied: "コピー済み!",
     shareRewardDesc: "シェアして+1回無料相談をゲット",
-    shareBonus: "相談+1回ゲット!", shareTodayLimit: "本日の報酬上限に達しました"
+    shareBonus: "相談+1回ゲット!", shareTodayLimit: "本日の報酬上限に達しました",
+    boardSortPopular: "人気順", boardSortLatest: "最新順",
+    boardNickLabel: "ニックネーム", boardEmptyMsg: "最初の幸運をシェアしよう!",
+    boardWriteBtn: "投稿", boardPosting: "投稿中...", boardDeleteConfirm: "削除"
   },
   es: {
     title: "K-Fortuna", subtitle: "Oráculo Místico", invoke: "Invocar", records: "Registros", oracle: "Oráculo", board: "Plaza",
@@ -83,6 +92,9 @@ export const TRANSLATIONS: Record<Lang, Translation> = {
     shareCard: "Tarjeta", shareSns: "Redes", shareInvite: "Invitar",
     shareSave: "Guardar Imagen", shareCopyLink: "Copiar Enlace", shareCopied: "¡Copiado!",
     shareRewardDesc: "Comparte y gana +1 consulta gratis hoy",
-    shareBonus: "¡+1 Consulta Obtenida!", shareTodayLimit: "Límite diario alcanzado"
+    shareBonus: "¡+1 Consulta Obtenida!", shareTodayLimit: "Límite diario alcanzado",
+    boardSortPopular: "Popular", boardSortLatest: "Reciente",
+    boardNickLabel: "Apodo", boardEmptyMsg: "¡Sé el primero en compartir tu suerte!",
+    boardWriteBtn: "Escribir", boardPosting: "Publicando...", boardDeleteConfirm: "Eliminar"
   }
 };
