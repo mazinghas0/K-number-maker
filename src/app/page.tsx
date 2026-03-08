@@ -6,6 +6,7 @@ import { User } from "@supabase/supabase-js";
 import { Lang, TabType, ThemeType, HistoryItem, BoardItem, UserProfile, AlarmsState, AnimPhase, PostBoardPayload } from "@/lib/types";
 import { TRANSLATIONS } from "@/lib/translations";
 import { analyzeDestiny } from "@/lib/fortuneEngine";
+import { calcFortuneType } from "@/lib/mbtiEngine";
 import { LOTTERY_PRESETS, THEMES } from "@/lib/constants";
 import Sidebar from "@/components/Sidebar";
 import GenerateTab from "@/components/GenerateTab";
@@ -42,6 +43,10 @@ export default function Home() {
   const t = TRANSLATIONS[lang];
   const activeTheme = THEMES[theme];
   const luckyElement = useMemo(() => analyzeDestiny(userProfile?.birthDate || ""), [userProfile]);
+  const fortuneType = useMemo(
+    () => (numbers.length > 0 ? calcFortuneType(luckyElement, numbers) : null),
+    [luckyElement, numbers]
+  );
 
   const triggerHaptic = useCallback(() => {
     if (typeof window !== "undefined" && window.navigator.vibrate) window.navigator.vibrate(15);
@@ -217,6 +222,8 @@ export default function Home() {
           isGenerating={isGenerating}
           activeTheme={activeTheme}
           t={t}
+          lang={lang}
+          fortuneType={fortuneType}
           onGenerate={handleGenerate}
         />
       )}

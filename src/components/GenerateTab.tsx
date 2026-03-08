@@ -1,9 +1,10 @@
 "use client";
 
 import React from "react";
-import { LotteryPreset, ThemeColors, Translation, AnimPhase } from "@/lib/types";
+import { LotteryPreset, ThemeColors, Translation, AnimPhase, FortuneType, Lang } from "@/lib/types";
 import { LOTTERY_PRESETS } from "@/lib/constants";
 import { getBallColor } from "@/lib/fortuneEngine";
+import FortuneMBTI from "@/components/FortuneMBTI";
 
 interface Props {
   selectedLotto: LotteryPreset;
@@ -17,12 +18,14 @@ interface Props {
   isGenerating: boolean;
   activeTheme: ThemeColors;
   t: Translation;
+  lang: Lang;
+  fortuneType: FortuneType | null;
   onGenerate: () => void;
 }
 
 export default function GenerateTab({
   selectedLotto, onLottoChange, customSettings, onCustomChange,
-  numbers, shuffledNums, revealCount, animPhase, isGenerating, activeTheme, t, onGenerate,
+  numbers, shuffledNums, revealCount, animPhase, isGenerating, activeTheme, t, lang, fortuneType, onGenerate,
 }: Props) {
   const displayNums: number[] = animPhase === "sort" ? numbers : shuffledNums.slice(0, revealCount);
 
@@ -160,6 +163,17 @@ export default function GenerateTab({
           </div>
         )}
       </section>
+
+      {/* 운명 MBTI 카드 */}
+      {animPhase === "sort" && numbers.length > 0 && fortuneType && (
+        <FortuneMBTI
+          fortuneType={fortuneType}
+          lang={lang}
+          numbers={numbers}
+          activeTheme={activeTheme}
+          t={t}
+        />
+      )}
 
       {/* 생성 버튼 */}
       <button
